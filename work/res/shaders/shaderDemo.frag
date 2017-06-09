@@ -16,9 +16,8 @@
 
 // Constant across both shaders
 uniform sampler2D texture0;
+uniform vec3 sky_color;
 
-// fog stuff
-const vec4 fog_color = vec4(0.7,0.7,0.7,1);
 
 // Values passed in from the vertex shader
 varying vec3 vNormal;
@@ -35,5 +34,5 @@ void main() {
     
 
 	// IMPORTANT tell OpenGL what the final color of the fragment is (vec4)
- 	gl_FragColor = mix(fog_color, vec4(color,1), visibility);
+ 	gl_FragColor = mix(vec4(sky_color,1), vec4(color,1), visibility);
 }

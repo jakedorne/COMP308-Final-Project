@@ -24,6 +24,7 @@
 #include "simple_shader.hpp"
 #include "opengl.hpp"
 #include "geometry.hpp"
+#include "particle_system.hpp"
 
 using namespace std;
 using namespace cgra;
@@ -60,10 +61,14 @@ GLuint g_texture = 0;
 GLuint g_shader = 0;
 
 vector<Geometry> objects;
+ParticleSystem particleSystem = ParticleSystem(vec3(0,30,0), 100, 100, 100, vec3(0,-1,0));
 
-vec4 spot_pos = vec4(0,20,0,1);
+vec4 spot_pos = vec4(0,100,0,1);
 vec3 spot_dir = vec3(0,-1,0);
 float spot_angle = 20.0f;
+
+
+vec3 sky_color = vec3(1.0, 0.7, 1.0);
 
 
 // Mouse Button callback
@@ -188,10 +193,10 @@ void initLight() {
     glLightfv(GL_LIGHT1, GL_DIFFUSE, diffintensity);
     
     // weak point light
-    float point_pos[] = { 5.0f, 1.0f, 0.0f, 1.0f };
-    float point_diff[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT2, GL_POSITION, point_pos);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, point_diff);
+//    float point_pos[] = { 5.0f, 1.0f, 0.0f, 1.0f };
+//    float point_diff[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+//    glLightfv(GL_LIGHT2, GL_POSITION, point_pos);
+//    glLightfv(GL_LIGHT2, GL_DIFFUSE, point_diff);
     
     // weak ambient light
     float ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -273,7 +278,7 @@ void setupCamera(int width, int height) {
 void render(int width, int height) {
 
 	// Grey/Blueish background
-	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+	glClearColor(sky_color.x, sky_color.y, sky_color.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -301,6 +306,13 @@ void render(int width, int height) {
         for(Geometry obj: objects) {
             obj.renderGeometry();
         }
+        
+        glDisable(GL_TEXTURE_2D);
+        particleSystem.generateParticles();
+        particleSystem.renderParticles();
+        particleSystem.updateParticles();
+        glEnable(GL_TEXTURE_2D);
+
 	}
 
 
@@ -325,9 +337,19 @@ void render(int width, int height) {
         
         for(Geometry obj: objects) {
             glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
-//            glUniform1i(glGetUniformLocation(g_shader, "mat_color"), obj.m_material.colo);
+            glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01);
+            glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
+            glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
             obj.renderGeometry();
         }
+        
+        glDisable(GL_TEXTURE_2D);
+        particleSystem.generateParticles();
+        particleSystem.renderParticles();
+        particleSystem.updateParticles();
+        glEnable(GL_TEXTURE_2D);
+        
+        
 		// Unbind our shader
 		glUseProgram(0);
 	}
@@ -350,7 +372,8 @@ void APIENTRY debugCallbackARB(GLenum, GLenum, GLuint, GLenum, GLsizei, const GL
 //Main program
 // 
 int main(int argc, char **argv) {
-	// Initialize the GLFW library
+    
+    // Initialize the GLFW library
 	if (!glfwInit()) {
 		cerr << "Error: Could not initialize GLFW" << endl;
 		abort(); // Unrecoverable error

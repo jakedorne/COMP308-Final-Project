@@ -8,15 +8,22 @@
 #include "cgra_math.hpp"
 #include "opengl.hpp"
 
-class Particle {
+using namespace cgra;
+
+class ParticleSystem {
     
 private:
     cgra::vec3 m_position;
-    cgra:vec3 m_velocity;
+    float m_width;
+    float m_length;
+    long m_ppr;
+    vec3 m_velocity;
     
 public:
-    Particle(cgra::vec3, cgra::vec3);
-    ~Particle();
-    void renderParticle();
+    ParticleSystem(vec3 position, float width, float length, long ppr, vec3 velocity);
+    ~ParticleSystem();
+    void renderParticles();
+    void generateParticles();
+    void updateParticles();
     
 };
