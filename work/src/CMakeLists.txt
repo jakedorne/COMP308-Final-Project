@@ -10,15 +10,18 @@ SET(headers
 	"opengl.hpp"
 	"simple_shader.hpp"
 	"simple_image.hpp"
-    "particle.hpp"
+    	"particle.hpp"
+	"geometry.hpp"
+	"particle_system.hpp"
 )
 
 
 # TODO list your source files (.cpp) here
 SET(sources
 	"main.cpp"
-    "object.cpp"
-    "particle.cpp"
+    	"geometry.cpp"
+    	"particle.cpp"
+	"particle_system.cpp"
 )
 # Add executable target and link libraries
 # You do not need to touch this
