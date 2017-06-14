@@ -33,7 +33,8 @@ using namespace cgra;
 
 bool showTrees = true; //Sets displaying of trees or table/bunny objects
 Tree tree = Tree();
-bool animate = true;
+bool animate = false;
+bool windy = false;
 
 // Window
 //
@@ -127,7 +128,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	// 	<< "action=" << action << "mods=" << mods << endl;
 	// YOUR CODE GOES HERE
 	// ...
-	//cout << 
+	cout << key << endl;
     if(key==GLFW_KEY_T && action==0) {
         g_rotating = true;
         g_angle = 0;
@@ -150,6 +151,24 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	else if (key == GLFW_KEY_E) {
 		spot_angle++;
 		if (spot_angle > 89) { spot_angle = 89; }
+	}
+	else if (key == GLFW_KEY_1 && action == 0) {
+		if (animate) {
+			animate = false;
+		}
+		else {
+			animate = true;
+		}
+	}
+	else if (key == GLFW_KEY_2 && action == 0) {
+		if (windy == true) {
+			windy = false;
+			tree.setWindy(false);
+		}
+		else {
+			windy = true;
+			tree.setWindy(true);
+		}
 	}
     
     

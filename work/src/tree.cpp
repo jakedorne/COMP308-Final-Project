@@ -186,3 +186,7 @@ void Tree::animate() {
 
 	}
 }
+
+void Tree::setWindy(bool change) {
+	windy = change;
+}

@@ -56,5 +56,6 @@ public:
 
 	void drawTree();
 	void animate();
+	void setWindy(bool change);
     
 };
