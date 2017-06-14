@@ -19,6 +19,7 @@ uniform sampler2D texture0;
 uniform float fog_density;
 uniform float time;
 uniform vec3 sky_color;
+uniform bool heatwave;
 
 // Values to pass to the fragment shader
 varying vec3 vNormal;
@@ -41,7 +42,7 @@ void main() {
     vPosition = vec3(gl_ModelViewMatrix * gl_Vertex);
     vTextureCoord0 = gl_MultiTexCoord0.xy;
   
-    vec4 worldPosition = vec4(vPosition,1.0);
+    vec4 worldPosition = vec4(vPosition,0.0);
     vec4 positionRelativeToCamera = gl_ModelViewMatrix * worldPosition;
     float distance = length(positionRelativeToCamera.xyz);
     visibility = exp(-pow((distance * fog_density), gradient));
@@ -50,5 +51,9 @@ void main() {
     
 	// IMPORTANT tell OpenGL where the vertex is
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_Position.y += rand(vec2(gl_Position.xy) + time);
+    
+    if(heatwave) {
+        gl_Position.y += rand(vec2(gl_Position.xy) + time);
+    }
+
 }

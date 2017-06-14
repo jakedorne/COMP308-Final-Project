@@ -29,10 +29,13 @@ void main() {
 
 	// Can do all sorts of cool stuff here
     
-    vec3 color;
-    color = texture2D(texture0, vTextureCoord0).rgb;
+    vec4 color;
+    color = texture2D(texture0, vTextureCoord0).rgba;
     
+    if(color.a < 1) {
+        discard;
+    }
 
 	// IMPORTANT tell OpenGL what the final color of the fragment is (vec4)
- 	gl_FragColor = mix(vec4(sky_color,1), vec4(color,1), visibility);
+ 	gl_FragColor = mix(vec4(sky_color,1), color, visibility);
 }

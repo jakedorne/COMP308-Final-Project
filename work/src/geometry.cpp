@@ -245,46 +245,15 @@ void Geometry::createDisplayListPoly() {
 }
 
 void Geometry::renderGeometry() {
-    
-    if(m_texture != -1) {
-        glDisable(GL_COLOR_MATERIAL);
-        glActiveTexture(GL_TEXTURE0);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        if(m_texturename!="cube") {
-            glDisable(GL_TEXTURE_GEN_S);
-            glDisable(GL_TEXTURE_GEN_T);
-            glDisable(GL_TEXTURE_GEN_R);
-            glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, m_texture);
-        } else {
-            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-            glEnable(GL_TEXTURE_GEN_S);
-            glEnable(GL_TEXTURE_GEN_T);
-            glEnable(GL_TEXTURE_GEN_R);
-            glEnable(GL_TEXTURE_CUBE_MAP);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);
-        }
-        
-    } else {
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_TEXTURE_CUBE_MAP);
-        glEnable(GL_COLOR_MATERIAL);
-        glColor3f(m_material.color.r, m_material.color.g, m_material.color.b);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, m_material.diffuse.dataPointer());
-        glMaterialfv(GL_FRONT, GL_AMBIENT, m_material.ambience.dataPointer());
-        glMaterialfv(GL_FRONT, GL_SPECULAR, m_material.specular.dataPointer());
-        glMaterialf(GL_FRONT, GL_SHININESS, m_material.shine * 128.0);
-    }
-    
     glShadeModel(GL_SMOOTH);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
     glCallList(m_displayListPoly);
     glPopMatrix();
+    
+    glDisable(GL_TEXTURE_2D);
 
-}
-
-
-void Geometry::toggleWireFrame() {
-    m_wireFrameOn = !m_wireFrameOn;
 }

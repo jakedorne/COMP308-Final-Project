@@ -56,20 +56,20 @@ float g_angle = 0;
 // Values and fields to showcase the use of shaders
 // Remove when modifying main.cpp for Assignment 3
 //
-bool g_useShader = false;
+bool g_useShader = true;
 GLuint g_texture = 0;
 GLuint g_shader = 0;
+GLuint particle_shader = 0;
 
 vector<Geometry> objects;
-ParticleSystem particleSystem = ParticleSystem(vec3(0,30,0), 100, 100, 100, vec3(0,-1,0));
+vector<ParticleSystem> particle_systems;
 
-vec4 spot_pos = vec4(0,100,0,1);
-vec3 spot_dir = vec3(0,-1,0);
-float spot_angle = 20.0f;
-
-
-vec3 sky_color = vec3(1.0, 0.7, 1.0);
-
+// weather variables
+vec3 sky_color = vec3(0.7, 0.9, 1);
+bool raining = false;
+bool snowing = false;
+float humidity = 0.7;
+float temperature = 0.5;
 
 // Mouse Button callback
 // Called for mouse movement event on since the last glfwPollEvents
@@ -117,33 +117,28 @@ void scrollCallback(GLFWwindow *win, double xoffset, double yoffset) {
 // Called for every key event on since the last glfwPollEvents
 //
 void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
-	// cout << "Key Callback :: key=" << key << "scancode=" << scancode
-	// 	<< "action=" << action << "mods=" << mods << endl;
-	// YOUR CODE GOES HERE
-	// ...
-    if(key==GLFW_KEY_T && action==0) {
-        g_rotating = true;
-        g_angle = 0;
-    } else if (key==GLFW_KEY_W) {
-        spot_pos.z--;
-    } else if (key==GLFW_KEY_A) {
-        spot_pos.x--;
-    } else if (key==GLFW_KEY_S) {
-        spot_pos.z++;
-    } else if (key==GLFW_KEY_D) {
-        spot_pos.x++;
-    } else if (key==GLFW_KEY_UP) {
-        spot_pos.y++;
-    } else if (key==GLFW_KEY_DOWN) {
-        spot_pos.y--;
-    } else if (key==GLFW_KEY_Q) {
-        spot_angle--;
-        if(spot_angle < 1) { spot_angle = 1;}
-    } else if (key==GLFW_KEY_E) {
-        spot_angle++;
-        if(spot_angle > 89) { spot_angle = 89;}
-    }
+//	 cout << "Key Callback :: key=" << key << "scancode=" << scancode << "action=" << action << "mods=" << mods << endl;
     
+    if(key==GLFW_KEY_A && action == 1) {
+        humidity -= 0.1;
+        if(humidity < 0) {humidity = 0;}
+        cout << "Humidity: " << humidity << endl;
+    }
+    if(key==GLFW_KEY_D && action == 1) {
+        humidity += 0.1;
+        if(humidity > 1.0) {humidity = 1.0;}
+        cout << "Humidity: " << humidity << endl;
+    }
+    if(key==GLFW_KEY_LEFT && action == 1) {
+        temperature -= 0.1;
+        if(temperature < 0) {temperature = 0;}
+        cout << "Temperature: " << temperature << endl;
+    }
+    if(key==GLFW_KEY_RIGHT && action == 1) {
+        temperature += 0.1;
+        if(temperature > 1.0) {temperature = 1.0;}
+        cout << "Temperature: " << temperature << endl;
+    }
     
 }
 
@@ -156,25 +151,6 @@ void charCallback(GLFWwindow *win, unsigned int c) {
 	// Not needed for this assignment, but useful to have later on
 }
 
-void initSkyBox(){
-    Image tex("./work/res/textures/cubeMap.jpg");
-    glActiveTexture(GL_TEXTURE0);
-    
-    glGenTextures(1, &g_texture); // Generate texture ID
-    glBindTexture(GL_TEXTURE_CUBE_MAP, g_texture); // Bind it as a 2D texture
-    
-    // Setup sampling strategies
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
-    // Finnaly, actually fill the data into our texture
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, tex.w, tex.h, tex.glFormat(), GL_UNSIGNED_BYTE, tex.dataPointer());
-    
-}
-
 // Sets up where and what the light is
 // Called once on start up
 // 
@@ -184,74 +160,19 @@ void initLight() {
     float diffintensity[] = { 0.1f, 0.1f, 0.1f, 1.0f };
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffintensity);
     
-    // spotlight
-    glLightfv(GL_LIGHT1, GL_POSITION, spot_pos.dataPointer());
-    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spot_angle);
-    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_dir.dataPointer());
-    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.05);
-    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 3);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffintensity);
-    
-    // weak point light
-//    float point_pos[] = { 5.0f, 1.0f, 0.0f, 1.0f };
-//    float point_diff[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-//    glLightfv(GL_LIGHT2, GL_POSITION, point_pos);
-//    glLightfv(GL_LIGHT2, GL_DIFFUSE, point_diff);
-    
     // weak ambient light
     float ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-    glLightfv(GL_LIGHT3, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
     
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
-    glEnable(GL_LIGHT2);
-    glEnable(GL_LIGHT3);
-    
-    // draw spotlight
-    glPushMatrix();
-    int cone_height = 4;
-    glTranslatef(spot_pos.x, spot_pos.y, spot_pos.z);
-    cgraSphere(1);
-    glTranslatef(0, -cone_height, 0);
-    glRotatef(-90, 1, 0, 0);
-
-    float rads = spot_angle * 3.14159265 / 180.0;
-    float radius = cone_height * tan(rads);
-    cgraCone(radius, cone_height);
-    glPopMatrix();
-
 }
-
-
-// An example of how to load a texure from a hardcoded location
-//
-void initTexture() {
-	Image tex("./work/res/textures/brick.jpg");
-
-	glActiveTexture(GL_TEXTURE0); // Use slot 0, need to use GL_TEXTURE1 ... etc if using more than one texture PER OBJECT
-	glGenTextures(1, &g_texture); // Generate texture ID
-	glBindTexture(GL_TEXTURE_2D, g_texture); // Bind it as a 2D texture
-
-	// Setup sampling strategies
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	// Finnaly, actually fill the data into our texture
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, tex.w, tex.h, tex.glFormat(), GL_UNSIGNED_BYTE, tex.dataPointer());
-}
-
-
 
 // An example of how to load a shader from a hardcoded location
 //
 void initShader() {
-	// To create a shader program we use a helper function
-	// We pass it an array of the types of shaders we want to compile
-	// and the corrosponding locations for the files of each stage
 	g_shader = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER }, { "./work/res/shaders/shaderDemo.vert", "./work/res/shaders/shaderDemo.frag" });
+//    particle_shader = makeShaderProgram({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER}, {"./work/res/shaders/particleShader.vert", "./work/res/shaders/particleShader.frag"});
 }
 
 
@@ -272,11 +193,43 @@ void setupCamera(int width, int height) {
 	glRotatef(g_yaw, 0, 1, 0);
 }
 
+void calculateWeather(){
+    
+    // sky color
+    float r = 0.7;
+    float g = 0.7 + (0.2 * temperature);
+    float b = 0.7 + (0.3 * temperature);
+    sky_color = vec3(r, g, b);
+    
+    // determine if raining, snowing or clear
+    if(humidity >= 0.8) {
+        if (temperature <= 0.1) {
+            particle_systems[0].disable();
+            particle_systems[1].enable();
+            
+        } else {
+            particle_systems[0].enable();
+            particle_systems[1].disable();
+        }
+    } else {
+        particle_systems[0].disable();
+        particle_systems[1].disable();
+    }
+    
+    // determine amount of fog
+    glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01 * humidity);
+
+    // heatwave memes
+    glUniform1i(glGetUniformLocation(g_shader, "heatwave"), (temperature >= 0.9) ? 1 : 0);
+
+}
+
 
 // Draw function
 //
 void render(int width, int height) {
 
+    
 	// Grey/Blueish background
 	glClearColor(sky_color.x, sky_color.y, sky_color.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -289,73 +242,38 @@ void render(int width, int height) {
 
 	setupCamera(width, height);
 
-    initLight();
-	// Without shaders
-	// Uses the default OpenGL pipeline
-	//
-	if (!g_useShader) {
-        if(g_rotating) {
-            g_angle++;
-            if(g_angle > 360) {
-                g_angle = 0;
-                g_rotating = false;
-            }
-            glRotatef(g_angle, 0, 1, 0);
+//    initLight();
+    
+    if(g_rotating) {
+        g_angle++;
+        if(g_angle > 360) {
+            g_angle = 0;
+            g_rotating = false;
         }
-        
-        for(Geometry obj: objects) {
-            obj.renderGeometry();
-        }
-        
-        glDisable(GL_TEXTURE_2D);
-        particleSystem.generateParticles();
-        particleSystem.renderParticles();
-        particleSystem.updateParticles();
-        glEnable(GL_TEXTURE_2D);
-
-	}
-
-
-	// With shaders (no lighting)
-	// Uses the shaders that you bind for the graphics pipeline
-	//
-	else {
-		// Use the shader we made
-		glUseProgram(g_shader);
-
-		// Set our sampler (texture0) to use GL_TEXTURE0 as the source
-
-
-        if(g_rotating) {
-            g_angle++;
-            if(g_angle > 360) {
-                g_angle = 0;
-                g_rotating = false;
-            }
-            glRotatef(g_angle, 0, 1, 0);
-        }
-        
-        for(Geometry obj: objects) {
-            glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
-            glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01);
-            glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
-            glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
-            obj.renderGeometry();
-        }
-        
-        glDisable(GL_TEXTURE_2D);
-        particleSystem.generateParticles();
-        particleSystem.renderParticles();
-        particleSystem.updateParticles();
-        glEnable(GL_TEXTURE_2D);
-        
-        
-		// Unbind our shader
-		glUseProgram(0);
-	}
-
-
-
+        glRotatef(g_angle, 0, 1, 0);
+    }
+    
+    glUseProgram(g_shader);
+    calculateWeather();
+    glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
+    glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
+    glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
+    
+    for(Geometry obj: objects) {
+        obj.renderGeometry();
+    }
+    
+//        glUseProgram(particle_shader);
+//        glUniform1i(glGetUniformLocation(particle_shader, "texture0"), 0);
+    
+    for(ParticleSystem ps: particle_systems) {
+        ps.generateParticles();
+        ps.updateParticles();
+        ps.renderParticles();
+    }
+    
+    // Unbind our shader
+    glUseProgram(0);
     
 	// Disable flags for cleanup (optional)
 	glDisable(GL_TEXTURE_2D);
@@ -451,15 +369,14 @@ int main(int argc, char **argv) {
     objects.push_back(Geometry("./work/res/assets/box.obj","./work/res/textures/brick.jpg", brick, vec3(6,2.5,-6)));
     objects.push_back(Geometry("./work/res/assets/table.obj","./work/res/textures/wood.jpg",wood, vec3(1,0,1)));
 
+    // rain and possibly snow particle systems.
+    ParticleSystem rain_system = ParticleSystem("./work/res/textures/rain.png", vec3(0,30,0), 300, 300, 200, vec3(0,-1,0));
+    ParticleSystem snow_system = ParticleSystem("./work/res/textures/snow2.png", vec3(0,30,0), 300, 300, 50, vec3(0,-0.1,0));
     
-	// Initialize Geometry/Material/Lights
-	// YOUR CODE GOES HERE
-	// ...
-	initLight();
-	// initTexture();
+    particle_systems.push_back(rain_system);
+    particle_systems.push_back(snow_system);
+    
 	initShader();
-
-
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(g_window)) {

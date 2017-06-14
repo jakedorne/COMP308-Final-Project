@@ -13,17 +13,22 @@ using namespace cgra;
 class ParticleSystem {
     
 private:
+    GLuint m_texture;
     cgra::vec3 m_position;
     float m_width;
     float m_length;
     long m_ppr;
     vec3 m_velocity;
+    bool enabled;
     
 public:
-    ParticleSystem(vec3 position, float width, float length, long ppr, vec3 velocity);
+    ParticleSystem(std::string texture_name, vec3 position, float width, float length, long ppr, vec3 velocity);
     ~ParticleSystem();
+    void initTexture(std::string);
     void renderParticles();
     void generateParticles();
     void updateParticles();
+    void enable();
+    void disable();
     
 };

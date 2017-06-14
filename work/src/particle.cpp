@@ -17,35 +17,38 @@ using namespace cgra;
 
 vec3 initial_position;
 
-Particle::Particle(vec3 position, vec3 velocity) {
+Particle::Particle(vec3 position, vec3 velocity, GLuint texture) {
     m_position = position;
     initial_position = position;
     m_velocity = velocity;
+    m_texture = texture;
 }
 
 Particle::~Particle() { }
 
 void Particle::render(){
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
 
     glBegin(GL_QUADS);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glNormal3f(0.0, 0.0, 1.0);
-//    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-0.01, -0.1, 0.0);
-//    glTexCoord2f(0.0, 1.0);
-    glVertex3f(-0.01, 0.1, 0.0);
-//    glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.01, 0.1, 0.0);
-//    glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.01, -0.1, 0.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-0.1, -0.1, 0.0);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(-0.1, 0.1, 0.0);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.1, 0.1, 0.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.1, -0.1, 0.0);
     glEnd();
-    glFlush();
-    glDisable(GL_BLEND);
+
     glPopMatrix();
+
+//    glDisable(GL_TEXTURE_2D);
 }
 
 bool Particle::update() {

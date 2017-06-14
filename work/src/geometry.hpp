@@ -52,7 +52,6 @@ private:
     std::vector<cgra::vec3> m_normals;	// Normal list
     std::vector<triangle> m_triangles;	// Triangle/Face list
     cgra::vec3 m_position;
-    bool m_wireFrameOn = false;
     
     // IDs for the display list to render
     GLuint m_displayListPoly = 0; // DisplayList for Polygon
@@ -68,6 +67,5 @@ public:
     Geometry(std::string, std::string, material, cgra::vec3);
     ~Geometry();
     void renderGeometry();
-    void toggleWireFrame();
     
 };
