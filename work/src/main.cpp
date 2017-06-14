@@ -25,9 +25,15 @@
 #include "opengl.hpp"
 #include "geometry.hpp"
 #include "particle_system.hpp"
+#include "tree.hpp"
 
 using namespace std;
 using namespace cgra;
+
+
+bool showTrees = true; //Sets displaying of trees or table/bunny objects
+Tree tree = Tree();
+bool animate = true;
 
 // Window
 //
@@ -121,6 +127,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	// 	<< "action=" << action << "mods=" << mods << endl;
 	// YOUR CODE GOES HERE
 	// ...
+	//cout << 
     if(key==GLFW_KEY_T && action==0) {
         g_rotating = true;
         g_angle = 0;
@@ -139,10 +146,11 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
     } else if (key==GLFW_KEY_Q) {
         spot_angle--;
         if(spot_angle < 1) { spot_angle = 1;}
-    } else if (key==GLFW_KEY_E) {
-        spot_angle++;
-        if(spot_angle > 89) { spot_angle = 89;}
-    }
+	}
+	else if (key == GLFW_KEY_E) {
+		spot_angle++;
+		if (spot_angle > 89) { spot_angle = 89; }
+	}
     
     
 }
@@ -293,69 +301,78 @@ void render(int width, int height) {
 	// Without shaders
 	// Uses the default OpenGL pipeline
 	//
-	if (!g_useShader) {
-        if(g_rotating) {
-            g_angle++;
-            if(g_angle > 360) {
-                g_angle = 0;
-                g_rotating = false;
-            }
-            glRotatef(g_angle, 0, 1, 0);
-        }
-        
-        for(Geometry obj: objects) {
-            obj.renderGeometry();
-        }
-        
-        glDisable(GL_TEXTURE_2D);
-        particleSystem.generateParticles();
-        particleSystem.renderParticles();
-        particleSystem.updateParticles();
-        glEnable(GL_TEXTURE_2D);
+	if (!showTrees) {
+		if (!g_useShader) {
+			if (g_rotating) {
+				g_angle++;
+				if (g_angle > 360) {
+					g_angle = 0;
+					g_rotating = false;
+				}
+				glRotatef(g_angle, 0, 1, 0);
+			}
+
+			for (Geometry obj : objects) {
+				obj.renderGeometry();
+			}
+
+			glDisable(GL_TEXTURE_2D);
+			particleSystem.generateParticles();
+			particleSystem.renderParticles();
+			particleSystem.updateParticles();
+			glEnable(GL_TEXTURE_2D);
+
+		}
+
+
+		// With shaders (no lighting)
+		// Uses the shaders that you bind for the graphics pipeline
+		//
+		else {
+			// Use the shader we made
+			glUseProgram(g_shader);
+
+			// Set our sampler (texture0) to use GL_TEXTURE0 as the source
+
+
+			if (g_rotating) {
+				g_angle++;
+				if (g_angle > 360) {
+					g_angle = 0;
+					g_rotating = false;
+				}
+				glRotatef(g_angle, 0, 1, 0);
+			}
+
+			for (Geometry obj : objects) {
+				glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
+				glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01);
+				glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
+				glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
+				obj.renderGeometry();
+			}
+
+			glDisable(GL_TEXTURE_2D);
+			particleSystem.generateParticles();
+			particleSystem.renderParticles();
+			particleSystem.updateParticles();
+			glEnable(GL_TEXTURE_2D);
+
+
+			// Unbind our shader
+			glUseProgram(0);
+		}
+
 
 	}
-
-
-	// With shaders (no lighting)
-	// Uses the shaders that you bind for the graphics pipeline
-	//
-	else {
-		// Use the shader we made
-		glUseProgram(g_shader);
-
-		// Set our sampler (texture0) to use GL_TEXTURE0 as the source
-
-
-        if(g_rotating) {
-            g_angle++;
-            if(g_angle > 360) {
-                g_angle = 0;
-                g_rotating = false;
-            }
-            glRotatef(g_angle, 0, 1, 0);
-        }
-        
-        for(Geometry obj: objects) {
-            glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
-            glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01);
-            glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
-            glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
-            obj.renderGeometry();
-        }
-        
-        glDisable(GL_TEXTURE_2D);
-        particleSystem.generateParticles();
-        particleSystem.renderParticles();
-        particleSystem.updateParticles();
-        glEnable(GL_TEXTURE_2D);
-        
-        
-		// Unbind our shader
-		glUseProgram(0);
+	else { //Where showing of trees rendering starts
+		//glRotatef(-90, 1,0,0);
+		//cgraCylinder(0.1, 0.1, tree.length);
+		tree.drawTree();
+		if (animate) {
+			tree.animate();
+		}
 	}
-
-
-
     
 	// Disable flags for cleanup (optional)
 	glDisable(GL_TEXTURE_2D);
@@ -436,21 +453,34 @@ int main(int argc, char **argv) {
 		cout << "GL_ARB_debug_output not available. No worries." << endl;
 	}
 
-    // diffuse, ambient, specular, color, shine
-    material bronze{vec3(0.7,0.4,0.18), vec4(0.2,0.1,0,1), vec3(0.4,0.3,0.2), vec3(0.6,0.4,0.3), 0.2f};
-    material plastic{vec3(0.5,0,0), vec4(0,0,1,1), vec3(0.7,0.6,0.6), vec3(1,0,0), 0.25f};
-    material metal{vec3(1,0.8,0.8), vec4(0.25,0.2,0.2,1), vec3(0.3,0.3,0.3), vec3(0.5,0.7,1), 0.09f};
-    material bone{vec3(1,0.8,0.8), vec4(0.25,0.2,0.2,1), vec3(0.3,0.3,0.3), vec3(1.0,1.0,0.95), 0.09f};
-    material wood{vec3(0,0,0), vec4(1,0.5,0,1), vec3(1.0,0.8,0), vec3(1,1,1), 0.2f};
-    material brick{vec3(0,0,0), vec4(0,0,1,0), vec3(0,0,0), vec3(1,1,1), 1.0f};
-    
-    objects.push_back(Geometry("./work/res/assets/torus.obj","", plastic, vec3(6,1,6)));
-    objects.push_back(Geometry("./work/res/assets/teapot.obj","cube", metal, vec3(-6,0.5,-6)));
-    objects.push_back(Geometry("./work/res/assets/sphere.obj","", bronze, vec3(-6,2,4)));
-    objects.push_back(Geometry("./work/res/assets/bunny.obj","", bone, vec3(1,0.5,1)));
-    objects.push_back(Geometry("./work/res/assets/box.obj","./work/res/textures/brick.jpg", brick, vec3(6,2.5,-6)));
-    objects.push_back(Geometry("./work/res/assets/table.obj","./work/res/textures/wood.jpg",wood, vec3(1,0,1)));
+	//--------------------------------
+	int num = (float)rand() / RAND_MAX;
 
+	for (int i = 0; i < tree.TREEDEPTH+1; i++) {
+		tree.expandTree(num);
+	}
+
+	for (int i = 0; i < tree.trees->size(); i++) {
+		cout << "----------------------------" << endl;
+		cout << tree.trees->at(i) << endl;
+	}
+	//----------------------------------------------
+	if (!showTrees) {
+		// diffuse, ambient, specular, color, shine
+		material bronze{ vec3(0.7,0.4,0.18), vec4(0.2,0.1,0,1), vec3(0.4,0.3,0.2), vec3(0.6,0.4,0.3), 0.2f };
+		material plastic{ vec3(0.5,0,0), vec4(0,0,1,1), vec3(0.7,0.6,0.6), vec3(1,0,0), 0.25f };
+		material metal{ vec3(1,0.8,0.8), vec4(0.25,0.2,0.2,1), vec3(0.3,0.3,0.3), vec3(0.5,0.7,1), 0.09f };
+		material bone{ vec3(1,0.8,0.8), vec4(0.25,0.2,0.2,1), vec3(0.3,0.3,0.3), vec3(1.0,1.0,0.95), 0.09f };
+		material wood{ vec3(0,0,0), vec4(1,0.5,0,1), vec3(1.0,0.8,0), vec3(1,1,1), 0.2f };
+		material brick{ vec3(0,0,0), vec4(0,0,1,0), vec3(0,0,0), vec3(1,1,1), 1.0f };
+
+		objects.push_back(Geometry("./work/res/assets/torus.obj", "", plastic, vec3(6, 1, 6)));
+		objects.push_back(Geometry("./work/res/assets/teapot.obj", "cube", metal, vec3(-6, 0.5, -6)));
+		objects.push_back(Geometry("./work/res/assets/sphere.obj", "", bronze, vec3(-6, 2, 4)));
+		objects.push_back(Geometry("./work/res/assets/bunny.obj", "", bone, vec3(1, 0.5, 1)));
+		objects.push_back(Geometry("./work/res/assets/box.obj", "./work/res/textures/brick.jpg", brick, vec3(6, 2.5, -6)));
+		objects.push_back(Geometry("./work/res/assets/table.obj", "./work/res/textures/wood.jpg", wood, vec3(1, 0, 1)));
+	}
     
 	// Initialize Geometry/Material/Lights
 	// YOUR CODE GOES HERE

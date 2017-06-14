@@ -13,6 +13,7 @@ SET(headers
     	"particle.hpp"
 	"geometry.hpp"
 	"particle_system.hpp"
+	"tree.hpp"
 )
 
 
@@ -22,6 +23,7 @@ SET(sources
     	"geometry.cpp"
     	"particle.cpp"
 	"particle_system.cpp"
+	"tree.cpp"
 )
 # Add executable target and link libraries
 # You do not need to touch this
