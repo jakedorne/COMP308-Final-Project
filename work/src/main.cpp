@@ -128,7 +128,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	// 	<< "action=" << action << "mods=" << mods << endl;
 	// YOUR CODE GOES HERE
 	// ...
-	cout << key << endl;
+	//cout << key << endl;
     if(key==GLFW_KEY_T && action==0) {
         g_rotating = true;
         g_angle = 0;
@@ -385,8 +385,13 @@ void render(int width, int height) {
 
 	}
 	else { //Where showing of trees rendering starts
-		//glRotatef(-90, 1,0,0);
-		//cgraCylinder(0.1, 0.1, tree.length);
+		glColor3f(1, 0, 0);
+		glPushMatrix();
+		glRotatef(-90, 1,0,0);
+		cgraCylinder(0.003, 0.003, tree.length);
+		glPopMatrix();
+
+		glColor3f(0, 1, 0);
 		tree.drawTree();
 		if (animate) {
 			tree.animate();
@@ -473,15 +478,16 @@ int main(int argc, char **argv) {
 	}
 
 	//--------------------------------
-	int num = (float)rand() / RAND_MAX;
 
+	double num = (double)rand() / (double)RAND_MAX;
 	for (int i = 0; i < tree.TREEDEPTH+1; i++) {
-		tree.expandTree(num);
+		tree.expandTree(0);
 	}
+	//cout << tree.trees->at(1) << endl;
 
 	for (int i = 0; i < tree.trees->size(); i++) {
-		cout << "----------------------------" << endl;
-		cout << tree.trees->at(i) << endl;
+		//cout << "----------------------------" << endl;
+		//cout << tree.trees->at(i) << endl;
 	}
 	//----------------------------------------------
 	if (!showTrees) {

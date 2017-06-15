@@ -27,32 +27,22 @@ public:
 	double elapsedTime, lastElapsedTime;
 	float incr;
 	const int TREEDEPTH = 6;
-	float MAX_TREE_LENGTH = 0.8;
+	float MAX_TREE_LENGTH = 0.4;
 	bool windy;
-	
 
 	Tree();
 
-	void turnRight();
-	void turnLeft();
-	void pitchDown();
-	void pitchUp();
-	void rollLeft();
-	void rollRight();
-
-	void drawLine();
+	void drawLine(int dCount);
 	void push();
 	void pop();
 	void leaf();
 	void rotR();
 	void rotL();
-
-	void thicken(float param);
-	void narrow(float param);
-	void setThickness(float param);
-	void setReduction(float param);
+	void rotF();
+	void rotB();
 
 	void expandTree(float num);
+	void compressTree(string treeS);
 
 	void drawTree();
 	void animate();

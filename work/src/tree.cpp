@@ -43,7 +43,7 @@ void Tree::expandTree(float num) {
 			treeString.replace(i, 1, "DD");
 			i = i + 1;
 		}
-		else if (!ns.compare("X")){
+		else if (!ns.compare("X")) {
 			{
 				if (num < 0.4) {
 					treeString.replace(i, 1, "D[LXV]D[RXV]LX");
@@ -57,7 +57,55 @@ void Tree::expandTree(float num) {
 
 		}
 	}
-	trees->push_back(treeString);
+	compressTree(treeString);
+}
+
+void Tree::compressTree(string treeS) {
+	string ns = ""; //New string
+
+	int dCount;
+
+	for (int i = 0; i < treeS.length();) {
+		if (treeS.at(i) == 'D') {
+			dCount = 0;
+			if (treeS.at(i + 1) != 'D') {
+				ns = ns + treeS.at(i);
+				i++;
+			}
+			else {
+				while (treeS.at(i + dCount) == 'D') {
+					dCount++;
+				}
+				i += dCount;
+				ns = ns + 'D' + to_string(dCount);
+			}
+		}
+		else {
+			ns = ns + treeS.at(i);
+			i++;
+		}
+	}
+
+	trees->push_back(ns);
+	
+	/*int count = 0;
+	for (int i = 0; i < treeS.length(); i++) {
+		if (treeS.at(i) == 'D') {
+			count++;
+		}
+	}
+	cout << "treeS dCount: " << count << endl;
+
+	count = 0;
+	for (int i = 0; i < ns.length(); i++) {
+		if (ns.at(i) == 'D') {
+			count++;
+		}
+	}
+	cout << "ns dCount: " << count << endl;
+
+	cout << "Orig: " << treeS << endl;
+	cout << "New: " << ns << endl;*/
 }
 
 void Tree::drawTree() {
@@ -66,8 +114,19 @@ void Tree::drawTree() {
 	for (int i = 0; i < LSystem.length(); i++) {
 		cl = LSystem.at(i);
 
-		if (!cl.compare("D") || !cl.compare("X")) {
-			drawLine();
+		if (!cl.compare("X")) {
+			drawLine(1);
+		}
+		else if (!cl.compare("D")) {
+			if (LSystem.at(i + 1) != 'D') {
+				drawLine(1);
+			}
+			else {
+				int dCount = 1;
+				
+
+				drawLine(dCount);
+			}
 		}
 		else if (!cl.compare("[")) {
 			push();
@@ -76,7 +135,7 @@ void Tree::drawTree() {
 			pop();
 		}
 		else if (!cl.compare("V")) {
-			leaf();
+			//leaf();
 		}
 		else if (!cl.compare("R")) {
 			rotR();
@@ -84,21 +143,30 @@ void Tree::drawTree() {
 		else if (!cl.compare("L")) {
 			rotL();
 		}
+		else if (!cl.compare("F")) {
+			rotF();
+		}
+		else if (!cl.compare("B")) {
+			rotB();
+		}
+		else {
+			cout << "Skipping Int" << endl;
+		}
 	}
 
 }
 
-void Tree::drawLine() {
+void Tree::drawLine(int dCount) {
 	//cout << "Draw" << endl;
 	glLineWidth(lineWidth);
 	glBegin(GL_LINES);
 	glVertex3f(0, 0, 0);
-	glVertex3f(0, length, 0);
+	glVertex3f(0, length*dCount, 0);
 	glEnd();
-	glTranslatef(0, length, 0);
+	glTranslatef(0, length*dCount, 0);
 
-	//cgraCylinder(0.1, 0.1, length);
-	//glTranslatef(0, length, 0);
+	//cgraCylinder(0.003, 0.003, length*dCount);
+	//glTranslatef(0, length*dCount, 0);
 }
 
 void Tree::push() {
@@ -127,6 +195,16 @@ void Tree::rotL() {
 	glRotatef(angle, 1, 0, 0);
 	glRotatef(angle * 4, 0, 1, 0);
 	glRotatef(angle, 0, 0, 1);
+}
+
+void Tree::rotF() {
+	glRotatef(angle, 1, 0, 0);
+	glRotatef(angle * 4, 0, 1, 0);
+	glRotatef(angle, 0, 0, 1);
+}
+
+void Tree::rotB() {
+
 }
 
 void Tree::leaf() {
@@ -175,14 +253,13 @@ void Tree::animate() {
 	
 	//Grow the tree until it reaches max tree height
 	if (currentDepth < TREEDEPTH && length <= MAX_TREE_LENGTH) {
-		length += 0.001;
+		length += 0.0005;
 	}
 
-	cout << elapsedTime << " : " << lastElapsedTime << endl;
+	//cout << elapsedTime << " : " << lastElapsedTime << endl;
 	if (elapsedTime - lastElapsedTime > 2 && currentDepth < TREEDEPTH) {
 		currentDepth++;
 		lastElapsedTime = elapsedTime;
-		cout << "a " << endl;
 
 	}
 }
