@@ -385,13 +385,12 @@ void render(int width, int height) {
 
 	}
 	else { //Where showing of trees rendering starts
-		glColor3f(1, 0, 0);
-		glPushMatrix();
-		glRotatef(-90, 1,0,0);
-		cgraCylinder(0.003, 0.003, tree.length);
-		glPopMatrix();
+		//glColor3f(1, 0, 0);
+		//glPushMatrix();
+		//glRotatef(-90, 1,0,0);
+		//cgraCylinder(0.003, 0.003, tree.length);
+		//glPopMatrix();
 
-		glColor3f(0, 1, 0);
 		tree.drawTree();
 		if (animate) {
 			tree.animate();
@@ -483,12 +482,16 @@ int main(int argc, char **argv) {
 	for (int i = 0; i < tree.TREEDEPTH+1; i++) {
 		tree.expandTree(0);
 	}
-	//cout << tree.trees->at(1) << endl;
 
 	for (int i = 0; i < tree.trees->size(); i++) {
-		//cout << "----------------------------" << endl;
-		//cout << tree.trees->at(i) << endl;
+		tree.compressTree(tree.trees->at(i));
 	}
+	tree.trees = tree.expandedTrees;
+
+	cout << tree.trees->at(1) << endl;
+
+	cout << tree.trees->size() << endl;
+
 	//----------------------------------------------
 	if (!showTrees) {
 		// diffuse, ambient, specular, color, shine

@@ -19,6 +19,7 @@ private:
 
 public:
 	vector<string> *trees = new vector<string>();
+	vector<string> *expandedTrees = new vector<string>();
 	string treeString;
 	int currentDepth, lineWidth;
 	float angle;

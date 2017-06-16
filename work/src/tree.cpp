@@ -57,7 +57,7 @@ void Tree::expandTree(float num) {
 
 		}
 	}
-	compressTree(treeString);
+	trees->push_back(treeString);
 }
 
 void Tree::compressTree(string treeS) {
@@ -86,47 +86,66 @@ void Tree::compressTree(string treeS) {
 		}
 	}
 
-	trees->push_back(ns);
+	expandedTrees->push_back(ns);
 	
-	/*int count = 0;
-	for (int i = 0; i < treeS.length(); i++) {
+
+	/*cout << "Orig: " << treeS << endl;
+	cout << "New: " << ns << endl;
+
+	cout << "Orig Size: " << treeS.size() << " | " << "New Size: " << ns.size() << endl;
+
+	int dCount1 = 0, dCount2 = 0, totalCount1 = 0, totalCount2 = 0;
+	for (int i = 0; i < treeS.size(); i++) {
 		if (treeS.at(i) == 'D') {
-			count++;
+			dCount1++;
 		}
-	}
-	cout << "treeS dCount: " << count << endl;
+		if (treeS.at(i) == 'X') {
+			totalCount1++;
+		}
 
-	count = 0;
-	for (int i = 0; i < ns.length(); i++) {
+	}
+	for (int i = 0; i < ns.size(); i++) {
 		if (ns.at(i) == 'D') {
-			count++;
+			dCount2++;
+		}
+		if (treeS.at(i) == 'X') {
+			totalCount2++;
 		}
 	}
-	cout << "ns dCount: " << count << endl;
-
-	cout << "Orig: " << treeS << endl;
-	cout << "New: " << ns << endl;*/
+	totalCount1 += dCount1;
+	totalCount2 += dCount2;
+	cout << "Orig dCount: " << dCount1 << " | " << "New dCount: " << dCount2 << endl;
+	cout << "Orig totalCount: " << totalCount1 << " | " << "New totalCount: " << totalCount2 << endl;*/
 }
 
 void Tree::drawTree() {
 	string cl; //Current letter
-	string LSystem = trees->at(currentDepth);
+	string LSystem = trees->at(currentDepth); //change to currentDepth
 	for (int i = 0; i < LSystem.length(); i++) {
 		cl = LSystem.at(i);
-
-		if (!cl.compare("X")) {
-			drawLine(1);
-		}
-		else if (!cl.compare("D")) {
-			if (LSystem.at(i + 1) != 'D') {
+		if (!cl.compare("D")) {
+			if(!isdigit(LSystem.at(i+1))){
 				drawLine(1);
 			}
 			else {
-				int dCount = 1;
+				int digitCount = 0;
+				while (isdigit(LSystem.at(i + 1 + digitCount))) {
+					digitCount++;
+				}
+				string str = LSystem.substr(i + 1, digitCount);
+
+				int dCount = stoi(str);
 				
+				while (LSystem.at(i + dCount) == 'D') {
+					dCount++;
+				}
+				i += digitCount;
 
 				drawLine(dCount);
 			}
+		}
+		else if (!cl.compare("X")) {
+			drawLine(1);
 		}
 		else if (!cl.compare("[")) {
 			push();
@@ -135,7 +154,7 @@ void Tree::drawTree() {
 			pop();
 		}
 		else if (!cl.compare("V")) {
-			//leaf();
+			leaf();
 		}
 		else if (!cl.compare("R")) {
 			rotR();
@@ -150,7 +169,7 @@ void Tree::drawTree() {
 			rotB();
 		}
 		else {
-			cout << "Skipping Int" << endl;
+			cout << "NO " << endl;
 		}
 	}
 
@@ -158,15 +177,20 @@ void Tree::drawTree() {
 
 void Tree::drawLine(int dCount) {
 	//cout << "Draw" << endl;
+	/*
 	glLineWidth(lineWidth);
 	glBegin(GL_LINES);
 	glVertex3f(0, 0, 0);
 	glVertex3f(0, length*dCount, 0);
 	glEnd();
 	glTranslatef(0, length*dCount, 0);
-
-	//cgraCylinder(0.003, 0.003, length*dCount);
-	//glTranslatef(0, length*dCount, 0);
+	*/
+	glPushMatrix();
+	glRotatef(-90, 1, 0, 0);
+	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount);
+	cgraCylinder(0.03, 0.03, length*dCount);
+	glPopMatrix();
+	glTranslatef(0, length*dCount, 0);
 }
 
 void Tree::push() {
