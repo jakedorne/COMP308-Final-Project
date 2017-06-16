@@ -31,7 +31,7 @@ public:
 	float incr;
 	const int TREEDEPTH = 3;
 	float MAX_TREE_LENGTH = 0.4;
-	bool windy;
+	bool windy, grow;
 
 
 	Tree();
@@ -50,7 +50,7 @@ public:
 
 	void drawTree();
 	void animate();
-	void setWindy(bool change);
+	void applyWind();
 
 	void setAngle(float a);
     

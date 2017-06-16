@@ -31,7 +31,7 @@ Tree::Tree()
 	lastElapsedTime = 0;
 	angle = 20;
 	incr = 0.1;
-	windy = false;
+	grow = true;
 	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" };
 	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" };
 	vector<string> rule3 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" };
@@ -229,11 +229,34 @@ void Tree::animate() {
 
 	elapsedTime = (clock() - lastTime) / (double)CLOCKS_PER_SEC;
 
-	float numR = (float)rand() / RAND_MAX;
+	if (grow) {
+		//Grow the tree until it reaches max tree height
+		if (currentDepth < TREEDEPTH && length <= MAX_TREE_LENGTH) {
+			length += 0.0005;
+		}
 
+		//cout << elapsedTime << " : " << lastElapsedTime << endl;
+		if (elapsedTime - lastElapsedTime > 2 && currentDepth < TREEDEPTH) {
+			currentDepth++;
+			lastElapsedTime = elapsedTime;
 
+		}
+	}
+	else {
+		if (currentDepth > 0 && length >= 0.1) {
+			length -= 0.0005;
+		}
+		if (elapsedTime - lastElapsedTime > 2 && currentDepth > 0) {
+			currentDepth--;
+			lastElapsedTime = elapsedTime;
+
+		}
+	}
+}
+
+void Tree::applyWind() {
 	//Make branches move in the wind/rain
-	if (windy) {
+	float numR = (float)rand() / RAND_MAX;
 		if (angle > 21.5) {
 			if (numR < 0.5) {
 				incr = -0.15;
@@ -251,24 +274,6 @@ void Tree::animate() {
 			}
 		}
 		angle += incr;
-	}
-	
-	
-	//Grow the tree until it reaches max tree height
-	if (currentDepth < TREEDEPTH && length <= MAX_TREE_LENGTH) {
-		length += 0.0005;
-	}
-
-	//cout << elapsedTime << " : " << lastElapsedTime << endl;
-	if (elapsedTime - lastElapsedTime > 2 && currentDepth < TREEDEPTH) {
-		currentDepth++;
-		lastElapsedTime = elapsedTime;
-
-	}
-}
-
-void Tree::setWindy(bool change) {
-	windy = change;
 }
 
 void Tree::setAngle(float a) {

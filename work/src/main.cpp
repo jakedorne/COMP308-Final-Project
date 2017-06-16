@@ -163,11 +163,9 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	else if (key == GLFW_KEY_2 && action == 0) {
 		if (windy == true) {
 			windy = false;
-			tree.setWindy(false);
 		}
 		else {
 			windy = true;
-			tree.setWindy(true);
 		}
 	}
 	else if (key == GLFW_KEY_3 && action == 0) {
@@ -178,6 +176,23 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 		tree.setAngle(-1);
 		cout << "Angle: " << tree.angle << endl;
 	}
+	else if (key == GLFW_KEY_5 && action == 0) {
+		if (tree.grow) {
+			tree.grow = false;
+		}
+		else {
+			tree.grow = true;
+		}
+	}
+	/*
+		TREE CONTROLS
+		
+		1 = Toggle Animate
+		2 = Toggle Wind
+		3 = Increase angle
+		4 = Decrease Angle
+		5 = Toggle grow/shrink
+	*/
 }
 
 
@@ -390,16 +405,13 @@ void render(int width, int height) {
 
 
 	}
-	else { //Where showing of trees rendering starts
-		//glColor3f(1, 0, 0);
-		//glPushMatrix();
-		//glRotatef(-90, 1,0,0);
-		//cgraCylinder(0.003, 0.003, tree.length);
-		//glPopMatrix();
-
+	else { 
 		tree.drawTree();
 		if (animate) {
 			tree.animate();
+		}
+		if (windy) {
+			tree.applyWind();
 		}
 	}
     
