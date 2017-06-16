@@ -20,6 +20,8 @@ private:
 public:
 	vector<string> *trees = new vector<string>();
 	vector<string> *expandedTrees = new vector<string>();
+	vector<vector<string>> *LSystemRules = new vector<vector<string>>();
+
 	string treeString;
 	int currentDepth, lineWidth;
 	float angle;
@@ -27,9 +29,10 @@ public:
 	std::clock_t lastTime;
 	double elapsedTime, lastElapsedTime;
 	float incr;
-	const int TREEDEPTH = 6;
+	const int TREEDEPTH = 3;
 	float MAX_TREE_LENGTH = 0.4;
 	bool windy;
+
 
 	Tree();
 
@@ -42,11 +45,13 @@ public:
 	void rotF();
 	void rotB();
 
-	void expandTree(float num);
+	void expandTree(float num, int ruleSet);
 	void compressTree(string treeS);
 
 	void drawTree();
 	void animate();
 	void setWindy(bool change);
+
+	void setAngle(float a);
     
 };

@@ -170,8 +170,14 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 			tree.setWindy(true);
 		}
 	}
-    
-    
+	else if (key == GLFW_KEY_3 && action == 0) {
+		tree.setAngle(1);
+		cout << "Angle: " << tree.angle << endl;
+	}
+	else if (key == GLFW_KEY_4 && action == 0) {
+		tree.setAngle(-1);
+		cout << "Angle: " << tree.angle << endl;
+	}
 }
 
 
@@ -480,7 +486,7 @@ int main(int argc, char **argv) {
 
 	double num = (double)rand() / (double)RAND_MAX;
 	for (int i = 0; i < tree.TREEDEPTH+1; i++) {
-		tree.expandTree(0);
+		tree.expandTree(0,1); //Rule set 0 is first set off rules
 	}
 
 	for (int i = 0; i < tree.trees->size(); i++) {

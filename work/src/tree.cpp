@@ -32,9 +32,15 @@ Tree::Tree()
 	angle = 20;
 	incr = 0.1;
 	windy = false;
+	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" };
+	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" };
+	vector<string> rule3 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" };
+	LSystemRules->push_back(rule1);
+	LSystemRules->push_back(rule2);
+	LSystemRules->push_back(rule3);
 }
 
-void Tree::expandTree(float num) {
+void Tree::expandTree(float num, int ruleSet) {
 	string ns = "";	//New string
 
 	for (int i = 0; i < treeString.length(); i++) {
@@ -46,13 +52,15 @@ void Tree::expandTree(float num) {
 		else if (!ns.compare("X")) {
 			{
 				if (num < 0.4) {
-					treeString.replace(i, 1, "D[LXV]D[RXV]LX");
+					treeString.replace(i, 1, LSystemRules->at(ruleSet)[0]);
 
 				}
 				else {
-					treeString.replace(i, 1, "D[RXV]D[LXV]RX");
+					treeString.replace(i, 1, LSystemRules->at(ruleSet)[1]);
 				}
-				i = i + 13;
+				
+				//ASSUMES BOTH RULES ARE OF THE SAME LENGTH --------------------IMPORTANT @@@@@@@@
+				i += LSystemRules->at(ruleSet)[0].size()-1;
 			}
 
 		}
@@ -87,35 +95,6 @@ void Tree::compressTree(string treeS) {
 	}
 
 	expandedTrees->push_back(ns);
-	
-
-	/*cout << "Orig: " << treeS << endl;
-	cout << "New: " << ns << endl;
-
-	cout << "Orig Size: " << treeS.size() << " | " << "New Size: " << ns.size() << endl;
-
-	int dCount1 = 0, dCount2 = 0, totalCount1 = 0, totalCount2 = 0;
-	for (int i = 0; i < treeS.size(); i++) {
-		if (treeS.at(i) == 'D') {
-			dCount1++;
-		}
-		if (treeS.at(i) == 'X') {
-			totalCount1++;
-		}
-
-	}
-	for (int i = 0; i < ns.size(); i++) {
-		if (ns.at(i) == 'D') {
-			dCount2++;
-		}
-		if (treeS.at(i) == 'X') {
-			totalCount2++;
-		}
-	}
-	totalCount1 += dCount1;
-	totalCount2 += dCount2;
-	cout << "Orig dCount: " << dCount1 << " | " << "New dCount: " << dCount2 << endl;
-	cout << "Orig totalCount: " << totalCount1 << " | " << "New totalCount: " << totalCount2 << endl;*/
 }
 
 void Tree::drawTree() {
@@ -169,7 +148,7 @@ void Tree::drawTree() {
 			rotB();
 		}
 		else {
-			cout << "NO " << endl;
+			cout << "drawTree shouldn't reach here" << endl;
 		}
 	}
 
@@ -187,8 +166,8 @@ void Tree::drawLine(int dCount) {
 	*/
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
-	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount);
-	cgraCylinder(0.03, 0.03, length*dCount);
+	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount); 
+	cgraCylinder(0.06, 0.03, length*dCount);
 	glPopMatrix();
 	glTranslatef(0, length*dCount, 0);
 }
@@ -290,4 +269,8 @@ void Tree::animate() {
 
 void Tree::setWindy(bool change) {
 	windy = change;
+}
+
+void Tree::setAngle(float a) {
+	angle += a;
 }
