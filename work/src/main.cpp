@@ -151,6 +151,24 @@ void charCallback(GLFWwindow *win, unsigned int c) {
 	// Not needed for this assignment, but useful to have later on
 }
 
+void initTexture(){
+    glGenTextures(1, &g_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    Image tex("./work/res/textures/grass.png");
+    glBindTexture(GL_TEXTURE_2D, g_texture); // Bind it as a 2D texture
+    
+    // Setup sampling strategies
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    // Finnaly, actually fill the data into our texture
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex.w, tex.h, tex.glFormat(), GL_UNSIGNED_BYTE, tex.dataPointer());
+}
+
 // Sets up where and what the light is
 // Called once on start up
 // 
@@ -172,7 +190,11 @@ void initLight() {
 //
 void initShader() {
 	g_shader = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER }, { "./work/res/shaders/shaderDemo.vert", "./work/res/shaders/shaderDemo.frag" });
-//    particle_shader = makeShaderProgram({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER}, {"./work/res/shaders/particleShader.vert", "./work/res/shaders/particleShader.frag"});
+
+    particle_shader = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER}, {"./work/res/shaders/particleShader.vert", "./work/res/shaders/particleShader.frag"});
+    
+    glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
+    glUniform1i(glGetUniformLocation(particle_shader, "texture0"), 0);
 }
 
 
@@ -191,6 +213,29 @@ void setupCamera(int width, int height) {
 	glTranslatef(0, 0, -50 * g_zoom);
 	glRotatef(g_pitch, 1, 0, 0);
 	glRotatef(g_yaw, 0, 1, 0);
+}
+
+void renderFloor(){
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, g_texture);
+    
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    
+    glNormal3f(0.0, 1.0, 0.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-100.0, 0, -100.0);
+    glTexCoord2f(0.0, 100.0);
+    glVertex3f(500.0, 0, -100.0);
+    glTexCoord2f(100.0, 100.0);
+    glVertex3f(100, 0, 100);
+    glTexCoord2f(100.0, 0.0);
+    glVertex3f(-100, 0, 100);
+    glEnd();
+    
+    glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
 }
 
 void calculateWeather(){
@@ -218,7 +263,9 @@ void calculateWeather(){
     
     // determine amount of fog
     glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01 * humidity);
-
+    glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
+    glUniform1f(glGetUniformLocation(particle_shader, "fog_density"), 0.01 * humidity);
+    glUniform3f(glGetUniformLocation(particle_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
     // heatwave memes
     glUniform1i(glGetUniformLocation(g_shader, "heatwave"), (temperature >= 0.9) ? 1 : 0);
 
@@ -228,7 +275,9 @@ void calculateWeather(){
 // Draw function
 //
 void render(int width, int height) {
-
+    
+    // use default shader
+    glUseProgram(g_shader);
     
 	// Grey/Blueish background
 	glClearColor(sky_color.x, sky_color.y, sky_color.z, 1.0f);
@@ -253,18 +302,21 @@ void render(int width, int height) {
         glRotatef(g_angle, 0, 1, 0);
     }
     
-    glUseProgram(g_shader);
+
     calculateWeather();
-    glUniform1i(glGetUniformLocation(g_shader, "texture0"), 0);
+
     glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
-    glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
+
+    
+    renderFloor();
     
     for(Geometry obj: objects) {
         obj.renderGeometry();
     }
     
-//        glUseProgram(particle_shader);
-//        glUniform1i(glGetUniformLocation(particle_shader, "texture0"), 0);
+    glUseProgram(particle_shader);
+
+
     
     for(ParticleSystem ps: particle_systems) {
         ps.generateParticles();
@@ -377,6 +429,7 @@ int main(int argc, char **argv) {
     particle_systems.push_back(snow_system);
     
 	initShader();
+    initTexture();
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(g_window)) {

@@ -21,7 +21,7 @@ uniform vec3 sky_color;
 
 // Values passed in from the vertex shader
 varying vec3 vNormal;
-varying vec3 vPosition;
+varying vec4 vPosition;
 varying vec2 vTextureCoord0;
 varying float visibility;
 
@@ -32,9 +32,9 @@ void main() {
     vec4 color;
     color = texture2D(texture0, vTextureCoord0).rgba;
     
-    if(color.a < 1) {
-        discard;
-    }
+//    if(color.a < 1) {
+//        discard;
+//    }
 
 	// IMPORTANT tell OpenGL what the final color of the fragment is (vec4)
  	gl_FragColor = mix(vec4(sky_color,1), color, visibility);

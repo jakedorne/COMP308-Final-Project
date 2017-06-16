@@ -81,6 +81,7 @@ void ParticleSystem::updateParticles(){
         if(!m_particles[i].update()){
             m_particles.erase(m_particles.begin());
         }
+//        m_particles[i].update();
     }
 }
 
