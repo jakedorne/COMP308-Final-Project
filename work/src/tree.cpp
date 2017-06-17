@@ -58,9 +58,9 @@ void Tree::expandTree(float num, int ruleSet) {
 				else {
 					treeString.replace(i, 1, LSystemRules->at(ruleSet)[1]);
 				}
-				
-				//ASSUMES BOTH RULES ARE OF THE SAME LENGTH --------------------IMPORTANT @@@@@@@@
-				i += LSystemRules->at(ruleSet)[0].size()-1;
+
+//ASSUMES BOTH RULES ARE OF THE SAME LENGTH --------------------IMPORTANT @@@@@@@@
+i += LSystemRules->at(ruleSet)[0].size() - 1;
 			}
 
 		}
@@ -103,7 +103,7 @@ void Tree::drawTree() {
 	for (int i = 0; i < LSystem.length(); i++) {
 		cl = LSystem.at(i);
 		if (!cl.compare("D")) {
-			if(!isdigit(LSystem.at(i+1))){
+			if (!isdigit(LSystem.at(i + 1))) {
 				drawLine(1);
 			}
 			else {
@@ -114,7 +114,7 @@ void Tree::drawTree() {
 				string str = LSystem.substr(i + 1, digitCount);
 
 				int dCount = stoi(str);
-				
+
 				while (LSystem.at(i + dCount) == 'D') {
 					dCount++;
 				}
@@ -154,16 +154,51 @@ void Tree::drawTree() {
 
 }
 
+void Tree::drawTree(string ts) {
+	vector<vector<string>> *partitions = new vector<vector<string>>();
+	if (ts.find('[') != string::npos) {
+		for (int i = 0; i < ts.size();) {
+			int fCount = 0; //Front count
+			string subStr = ts.substr(i, ts.size()-i);
+			if (subStr.find('[') != string::npos) {
+				while (ts.at(i + fCount) != '[') {
+					fCount++;
+				}
+				//At first [ char
+				int bCount = 1; //Bracket count
+				int eCount = 0; //Extra count
+				while (bCount > 0) {
+					if (ts.at(fCount + 1 + eCount+i) == '[') {
+						bCount++;
+					}
+					else if (ts.at(fCount + 1 + eCount+i) == ']') {
+						bCount--;
+					}
+					eCount++;
+				}
+				vector<string> vec = { ts.substr(i,fCount), ts.substr(i + fCount + 1, eCount - 1) };
+				partitions->push_back(vec);
+				i++;
+				i += eCount;
+				i += fCount;
+			}
+			else {
+				vector<string> vec = { "END", subStr };
+				partitions->push_back(vec);
+				i += subStr.size();
+			}
+		}
+	}
+	else {
+		cout << "NOT FOUND" << endl;
+	}
+	//find_last_of(']') //finds last occurance of char
+	for (int i = 0; i < partitions->size(); i++) {
+		cout << "Partitions: " << partitions->at(i)[0] << " : " << partitions->at(i)[1] << endl;
+	}
+}
+
 void Tree::drawLine(int dCount) {
-	//cout << "Draw" << endl;
-	/*
-	glLineWidth(lineWidth);
-	glBegin(GL_LINES);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, length*dCount, 0);
-	glEnd();
-	glTranslatef(0, length*dCount, 0);
-	*/
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
 	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount); 

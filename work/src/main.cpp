@@ -478,10 +478,11 @@ int main(int argc, char **argv) {
 	}
 	tree.trees = tree.expandedTrees;
 
-	cout << tree.trees->at(1) << endl;
 
-	cout << tree.trees->size() << endl;
-
+	//tree.drawTree("DD[LD[LXV]D[RXV]LXV]DD[RD[LXV]D[RXV]LXV]LD[LXV]D[RXV]LX");
+	//tree.drawTree("DD[LD[LXV]D[RXV]DXV]DD[RD[LXV]D[RXV]DXV]DDD[LXV]D[RXV]DX");
+	//tree.drawTree(tree.trees->at(5));
+	//tree.drawTree("DDL[[DL[[X]RX]RD[RDX]LX]RDL[[X]RX]RD[RDX]LX]RDD[RDDDL[[X]RX]RD[RDX]LX]LDL[[X]RX]RD[RDX]LX");
 	//----------------------------------------------
 	if (!showTrees) {
 		// diffuse, ambient, specular, color, shine
