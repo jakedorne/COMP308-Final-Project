@@ -188,14 +188,112 @@ void Tree::drawTree(string ts) {
 				i += subStr.size();
 			}
 		}
+
+		/*COMPLETED MAKING PARTITION LIST
+			
+			TODO
+			- RECURSE OVER LIST
+			- ONCE LIST FINISHED FIGURE OUT WHAT TO DRAW FOR SELF
+			- DRAW SELF
+
+		*/
+		string fullCylinder = "";
+		for (int i = 0; i < partitions->size(); i++) {
+				push();
+				string cl; //current letter
+				for (int j = 0; j < partitions->at(i)[1].size(); i++) {
+					cl = partitions->at(i)[1].at(j);
+					if (!cl.compare("D")) {
+						translate(1);
+					}
+					else if (!cl.compare("X")) {
+						drawLine(1);
+					}
+					else if (!cl.compare("[")) {
+						push();
+					}
+					else if (!cl.compare("]")) {
+						pop();
+					}
+					else if (!cl.compare("V")) {
+						//leaf();
+					}
+					else if (!cl.compare("R")) {
+						rotR();
+					}
+					else if (!cl.compare("L")) {
+						rotL();
+					}
+				}
+				drawTree(partitions->at(i)[1]);
+				pop();	
+				fullCylinder = fullCylinder + partitions->at(i)[0];
+		}
+		cout << fullCylinder << endl;
+
 	}
 	else {
-		cout << "NOT FOUND" << endl;
+		cout << "DRAW SECTION" << endl;
+		string cl; //Current letter
+		for (int i = 0; i < ts.size(); i++) {
+		cl = ts.at(i);
+		if (!cl.compare("D")) {
+			if (!isdigit(ts.at(i + 1))) {
+				drawLine(1);
+			}
+			else {
+				int digitCount = 0;
+				while (isdigit(ts.at(i + 1 + digitCount))) {
+					digitCount++;
+				}
+				string str = ts.substr(i + 1, digitCount);
+
+				int dCount = stoi(str);
+
+				while (ts.at(i + dCount) == 'D') {
+					dCount++;
+				}
+				i += digitCount;
+
+				drawLine(dCount);
+			}
+		}
+		else if (!cl.compare("X")) {
+			drawLine(1);
+		}
+		else if (!cl.compare("[")) {
+			push();
+		}
+		else if (!cl.compare("]")) {
+			pop();
+		}
+		else if (!cl.compare("V")) {
+			//leaf();
+		}
+		else if (!cl.compare("R")) {
+			rotR();
+		}
+		else if (!cl.compare("L")) {
+			rotL();
+		}
+		else if (!cl.compare("F")) {
+			rotF();
+		}
+		else if (!cl.compare("B")) {
+			rotB();
+		}
+		else {
+			cout << "drawTree shouldn't reach here" << endl;
+		}
 	}
-	//find_last_of(']') //finds last occurance of char
-	for (int i = 0; i < partitions->size(); i++) {
+	}
+	/*for (int i = 0; i < partitions->size(); i++) {
 		cout << "Partitions: " << partitions->at(i)[0] << " : " << partitions->at(i)[1] << endl;
-	}
+	}*/
+}
+
+void Tree::translate(int dCount) {
+	glTranslatef(0, length*dCount, 0);
 }
 
 void Tree::drawLine(int dCount) {
@@ -313,4 +411,13 @@ void Tree::applyWind() {
 
 void Tree::setAngle(float a) {
 	angle += a;
+}
+
+bool Tree::checkSame(string str) {
+	for (int i = 0; i < str.size(); i++) {
+		if (!str.at(0) == str.at(i)) {
+			return false;
+		}
+	}
+	return true;
 }

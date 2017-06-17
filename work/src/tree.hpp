@@ -54,5 +54,7 @@ public:
 	void applyWind();
 
 	void setAngle(float a);
+	bool checkSame(string str);
+	void translate(int dCount);
     
 };
