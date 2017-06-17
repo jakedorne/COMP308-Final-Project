@@ -38,6 +38,41 @@ Tree::Tree()
 	LSystemRules->push_back(rule1);
 	LSystemRules->push_back(rule2);
 	LSystemRules->push_back(rule3);
+//    initTextures();
+}
+
+void Tree::initTextures(){
+    glGenTextures(1, &bark_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    Image tex("./work/res/textures/bark.png");
+    glBindTexture(GL_TEXTURE_2D, bark_texture); // Bind it as a 2D texture
+    
+    // Setup sampling strategies
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    // Finnaly, actually fill the data into our texture
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex.w, tex.h, tex.glFormat(), GL_UNSIGNED_BYTE, tex.dataPointer());
+    
+    glGenTextures(1, &leaf_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    Image tex2("./work/res/textures/leaf.png");
+    glBindTexture(GL_TEXTURE_2D, leaf_texture); // Bind it as a 2D texture
+    
+    // Setup sampling strategies
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    // Finnaly, actually fill the data into our texture
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex2.w, tex2.h, tex2.glFormat(), GL_UNSIGNED_BYTE, tex2.dataPointer());
 }
 
 void Tree::expandTree(float num, int ruleSet) {
@@ -164,6 +199,9 @@ void Tree::drawLine(int dCount) {
 	glEnd();
 	glTranslatef(0, length*dCount, 0);
 	*/
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, bark_texture);
+    
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
 	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount); 
@@ -212,14 +250,28 @@ void Tree::rotB() {
 
 void Tree::leaf() {
 	//cout << "leaf" << endl;
-	glBegin(GL_TRIANGLES);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0.2, 0, 0.3);
-	glVertex3f(0, 1, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(-0.2, 0, -0.3);
-	glVertex3f(0, 1, 0);
-	glEnd();
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, leaf_texture);
+    
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    
+    glBegin(GL_QUADS);
+    glNormal3f(0.0, 0.0, 1.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-0.1, -0.1, 0.0);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(-0.1, 0.1, 0.0);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.1, 0.1, 0.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.1, -0.1, 0.0);
+    glEnd();
+    
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+    
 }
 
 void Tree::animate() {

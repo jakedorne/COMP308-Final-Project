@@ -32,8 +32,7 @@ using namespace cgra;
 
 
 bool showTrees = true; //Sets displaying of trees or table/bunny objects
-Tree tree = Tree();
-bool animate = false;
+bool animate = true;
 bool windy = false;
 
 // Window
@@ -70,6 +69,8 @@ GLuint particle_shader = 0;
 
 vector<Geometry> objects;
 vector<ParticleSystem> particle_systems;
+vector<Tree> trees;
+Tree tree = Tree();
 
 // weather variables
 vec3 sky_color = vec3(0.7, 0.9, 1);
@@ -163,20 +164,26 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 		}
 	}
 	else if (key == GLFW_KEY_3 && action == 0) {
-		tree.setAngle(1);
-		cout << "Angle: " << tree.angle << endl;
+//        for(Tree tree: trees) {
+            tree.setAngle(1);
+            cout << "Angle: " << tree.angle << endl;
+//        }
 	}
 	else if (key == GLFW_KEY_4 && action == 0) {
-		tree.setAngle(-1);
-		cout << "Angle: " << tree.angle << endl;
+//        for(Tree tree: trees) {
+            tree.setAngle(-1);
+            cout << "Angle: " << tree.angle << endl;
+//        }
 	}
 	else if (key == GLFW_KEY_5 && action == 0) {
-		if (tree.grow) {
-			tree.grow = false;
-		}
-		else {
-			tree.grow = true;
-		}
+//        for(Tree tree: trees) {
+            if (tree.grow) {
+                tree.grow = false;
+            }
+            else {
+                tree.grow = true;
+            }
+//        }
 	}
 	/*
 		TREE CONTROLS
@@ -338,9 +345,6 @@ void render(int width, int height) {
 
 	setupCamera(width, height);
 
-
-//    initLight();
-    
     if(g_rotating) {
         g_angle++;
         if(g_angle > 360) {
@@ -355,18 +359,18 @@ void render(int width, int height) {
 
     glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
 
-    
     renderFloor();
     
     if (showTrees) {
-        
-        tree.drawTree();
-        if (animate) {
-            tree.animate();
-        }
-        if (windy) {
-            tree.applyWind();
-        }
+//        for(Tree tree: trees) {
+            tree.drawTree();
+            if (animate) {
+                tree.animate();
+            }
+            if (windy) {
+                tree.applyWind();
+            }
+//        }
     }
     
     glUseProgram(particle_shader);
@@ -459,46 +463,31 @@ int main(int argc, char **argv) {
 		cout << "GL_ARB_debug_output not available. No worries." << endl;
 	}
 
-	//--------------------------------
-
-    // rain and possibly snow particle systems.
+    // initialising particle system
     ParticleSystem rain_system = ParticleSystem("./work/res/textures/rain.png", vec3(0,30,0), 300, 300, 200, vec3(0,-1,0));
     ParticleSystem snow_system = ParticleSystem("./work/res/textures/snow2.png", vec3(0,30,0), 300, 300, 50, vec3(0,-0.1,0));
     
     particle_systems.push_back(rain_system);
     particle_systems.push_back(snow_system);
-
+    
 	double num = (double)rand() / (double)RAND_MAX;
-	for (int i = 0; i < tree.TREEDEPTH+1; i++) {
-		tree.expandTree(0,1); //Rule set 0 is first set off rules
-	}
-
-	for (int i = 0; i < tree.trees->size(); i++) {
-		tree.compressTree(tree.trees->at(i));
-	}
-	tree.trees = tree.expandedTrees;
-
-	cout << tree.trees->at(1) << endl;
-
-	cout << tree.trees->size() << endl;
-
-	//----------------------------------------------
-	if (!showTrees) {
-		// diffuse, ambient, specular, color, shine
-		material bronze{ vec3(0.7,0.4,0.18), vec4(0.2,0.1,0,1), vec3(0.4,0.3,0.2), vec3(0.6,0.4,0.3), 0.2f };
-		material plastic{ vec3(0.5,0,0), vec4(0,0,1,1), vec3(0.7,0.6,0.6), vec3(1,0,0), 0.25f };
-		material metal{ vec3(1,0.8,0.8), vec4(0.25,0.2,0.2,1), vec3(0.3,0.3,0.3), vec3(0.5,0.7,1), 0.09f };
-		material bone{ vec3(1,0.8,0.8), vec4(0.25,0.2,0.2,1), vec3(0.3,0.3,0.3), vec3(1.0,1.0,0.95), 0.09f };
-		material wood{ vec3(0,0,0), vec4(1,0.5,0,1), vec3(1.0,0.8,0), vec3(1,1,1), 0.2f };
-		material brick{ vec3(0,0,0), vec4(0,0,1,0), vec3(0,0,0), vec3(1,1,1), 1.0f };
-
-		objects.push_back(Geometry("./work/res/assets/torus.obj", "", plastic, vec3(6, 1, 6)));
-		objects.push_back(Geometry("./work/res/assets/teapot.obj", "cube", metal, vec3(-6, 0.5, -6)));
-		objects.push_back(Geometry("./work/res/assets/sphere.obj", "", bronze, vec3(-6, 2, 4)));
-		objects.push_back(Geometry("./work/res/assets/bunny.obj", "", bone, vec3(1, 0.5, 1)));
-		objects.push_back(Geometry("./work/res/assets/box.obj", "./work/res/textures/brick.jpg", brick, vec3(6, 2.5, -6)));
-		objects.push_back(Geometry("./work/res/assets/table.obj", "./work/res/textures/wood.jpg", wood, vec3(1, 0, 1)));
-	}
+    
+    trees.push_back(Tree());
+    
+//    for (Tree tree: trees) {
+        for (int i = 0; i < tree.TREEDEPTH+1; i++) {
+            tree.expandTree(0,1); //Rule set 0 is first set off rules
+        }
+        
+        for (int i = 0; i < tree.trees->size(); i++) {
+            tree.compressTree(tree.trees->at(i));
+        }
+        tree.trees = tree.expandedTrees;
+        
+        cout << tree.trees->at(1) << endl;
+        
+        cout << tree.trees->size() << endl;
+//    }
     
 	initShader();
     initTexture();

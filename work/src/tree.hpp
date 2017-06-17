@@ -32,10 +32,14 @@ public:
 	const int TREEDEPTH = 3;
 	float MAX_TREE_LENGTH = 0.4;
 	bool windy, grow;
+    
+    // textures
+    GLuint bark_texture;
+    GLuint leaf_texture;
 
 
 	Tree();
-
+    void initTextures();
 	void drawLine(int dCount);
 	void push();
 	void pop();
