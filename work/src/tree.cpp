@@ -32,12 +32,18 @@ Tree::Tree()
 	angle = 20;
 	incr = 0.1;
 	grow = true;
-	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" };
-	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" };
-	vector<string> rule3 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" };
+	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" }; //n=7, ang=20
+	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" }; //n=7, ang=25.7
+	vector<string> rule4 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" }; //n=5, ang=22.5
+	vector<string> rule3 = { "D[LD]D[RD]D", "D[RD]D[LD]D" }; //n=5, ang=25.7
+	vector<string> rule5 = { "D[LD]D[RD][D]", "D[RD]D[LD][D]" }; //n=5, ang=20
+	vector<string> rule6 = { "DDR[RDLDLD]L[LDRDRD]", "DDL[LDRDRD]R[RDLDLD]" }; //n=4, ang=22.5
 	LSystemRules->push_back(rule1);
 	LSystemRules->push_back(rule2);
 	LSystemRules->push_back(rule3);
+	LSystemRules->push_back(rule4);
+	LSystemRules->push_back(rule5);
+	LSystemRules->push_back(rule6);
 }
 
 void Tree::expandTree(float num, int ruleSet) {
@@ -201,7 +207,8 @@ void Tree::drawTree(string ts) {
 		for (int i = 0; i < partitions->size(); i++) {
 				push();
 				string cl; //current letter
-				for (int j = 0; j < partitions->at(i)[1].size(); i++) {
+				for (int j = 0; j < partitions->at(i)[1].size(); j++) {
+					cout << partitions->at(i)[1] << endl;
 					cl = partitions->at(i)[1].at(j);
 					if (!cl.compare("D")) {
 						translate(1);

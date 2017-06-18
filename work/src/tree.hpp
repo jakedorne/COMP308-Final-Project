@@ -29,7 +29,7 @@ public:
 	std::clock_t lastTime;
 	double elapsedTime, lastElapsedTime;
 	float incr;
-	const int TREEDEPTH = 6;
+	const int TREEDEPTH = 3;
 	float MAX_TREE_LENGTH = 0.4;
 	bool windy, grow;
 
