@@ -32,8 +32,8 @@ const float gradient = 1.0;
 // heat stuff
 const float heatwave_offset = 1;
 
-float frequency=50.0;
-float amplitude=0.5;
+float frequency= 40.0;
+float amplitude= 0.5;
 
 void main() {
     // Transform and pass on the normal/position/texture to fragment shader
