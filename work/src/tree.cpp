@@ -19,9 +19,9 @@
 using namespace std;
 using namespace cgra;
 
-Tree::Tree(float x, float z, int rule)
+Tree::Tree(float x, float z, int rule, string ts)
 {
-	treeString = "X";
+	treeString = ts;
 	currentDepth = 0;
 	length = 0.000001;
 	lineWidth = 10;
@@ -34,9 +34,9 @@ Tree::Tree(float x, float z, int rule)
 	incr = 0.1;
 	grow = true;
     startedTexture = false;
-	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" }; //n=7, ang=20
-	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" }; //n=7, ang=25.7
-	vector<string> rule3 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" }; //n=5, ang=22.5
+	vector<string> rule1 = { "D[LXV]D[RXV]LX", "DD" }; //n=7, ang=20
+	vector<string> rule2 = { "D[LXV]D[RXV]DX", "DD" }; //n=7, ang=25.7
+	vector<string> rule3 = { "D[RXV][LXV]DX", "DD" };
 	LSystemRules->push_back(rule1);
 	LSystemRules->push_back(rule2);
 	LSystemRules->push_back(rule3);
@@ -80,25 +80,18 @@ void Tree::initTextures(){
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex2.w, tex2.h, tex2.glFormat(), GL_UNSIGNED_BYTE, tex2.dataPointer());
 }
 
-void Tree::expandTree(float num) {
+void Tree::expandTree() {
 	string ns = "";	//New string
 	cout << LSystemRules->at(ruleNo)[0] << endl;
 	for (int i = 0; i < treeString.length(); i++) {
 		ns = treeString.at(i);
 		if (!ns.compare("D")) {
-			treeString.replace(i, 1, "DD");
-			i = i + 1;
+			treeString.replace(i, 1, LSystemRules->at(ruleNo)[1]);
+			i += LSystemRules->at(ruleNo)[1].size()-1;
 		}
 		else if (!ns.compare("X")) {
 			{
-				if (num < 0.4) {
 					treeString.replace(i, 1, LSystemRules->at(ruleNo)[0]);
-
-				}
-				else {
-					treeString.replace(i, 1, LSystemRules->at(ruleNo)[1]);
-				}
-				
 				//ASSUMES BOTH RULES ARE OF THE SAME LENGTH --------------------IMPORTANT @@@@@@@@
 				i += LSystemRules->at(ruleNo)[0].size()-1;
 			}
@@ -296,12 +289,12 @@ void Tree::animate() {
 
 	if (grow) {
 		//Grow the tree until it reaches max tree height
-		if (currentDepth < TREEDEPTH && length <= MAX_TREE_LENGTH) {
-			length += 0.0005;
+		if ((currentDepth < TREEDEPTH && length <= MAX_TREE_LENGTH) || length <= MAX_TREE_LENGTH) {
+			length += 0.00005;
 		}
 
 		//cout << elapsedTime << " : " << lastElapsedTime << endl;
-		if (elapsedTime - lastElapsedTime > 2 && currentDepth < TREEDEPTH) {
+		if (elapsedTime - lastElapsedTime > 4 && currentDepth < TREEDEPTH) {
 			currentDepth++;
 			lastElapsedTime = elapsedTime;
 
@@ -309,9 +302,9 @@ void Tree::animate() {
 	}
 	else {
 		if (currentDepth > 0 && length >= 0.1) {
-			length -= 0.0005;
+			length -= 0.00005;
 		}
-		if (elapsedTime - lastElapsedTime > 2 && currentDepth > 0) {
+		if (elapsedTime - lastElapsedTime > 4 && currentDepth > 0) {
 			currentDepth--;
 			lastElapsedTime = elapsedTime;
 

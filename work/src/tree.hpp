@@ -29,7 +29,7 @@ public:
 	std::clock_t lastTime;
 	double elapsedTime, lastElapsedTime;
 	float incr;
-	const int TREEDEPTH = 5;
+	const int TREEDEPTH = 6;
 	float MAX_TREE_LENGTH = 0.07;
 	bool windy, grow;
 	float cylWidth;
@@ -43,7 +43,7 @@ public:
     GLuint leaf_texture;
 
 
-	Tree(float x, float z, int ruleNo);
+	Tree(float x, float z, int ruleNo, string ts);
     void initTextures();
 	void drawLine(int dCount);
 	void drawCyl(int dCount);
@@ -53,7 +53,7 @@ public:
 	void rotR();
 	void rotL();
 
-	void expandTree(float num);
+	void expandTree();
 	void compressTree(string treeS);
 
 	void drawTree(bool dim);

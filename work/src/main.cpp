@@ -72,9 +72,9 @@ GLuint particle_shader = 0;
 vector<Geometry> objects;
 vector<ParticleSystem> particle_systems;
 vector<Tree> trees;
-Tree tree = Tree(7,7,0);
-Tree tree2 = Tree(0, 0, 1);
-Tree tree3 = Tree(-7, -7, 2);
+Tree tree = Tree(7,7,0, "X");
+Tree tree2 = Tree(0, 0, 1, "X");
+Tree tree3 = Tree(-7, -7, 2, "X");
 
 // weather variables
 vec3 sky_color = vec3(0.7, 0.9, 1);
@@ -513,12 +513,12 @@ int main(int argc, char **argv) {
     
 //    for (Tree tree: trees) {
         for (int i = 0; i < tree.TREEDEPTH+1; i++) {
-            tree.expandTree(0);
-			tree2.expandTree(0);
-			tree3.expandTree(0);
+            tree.expandTree();
+			tree2.expandTree();
+			tree3.expandTree();
         }
         
-        for (int i = 0; i < tree.trees->size(); i++) {
+        /*for (int i = 0; i < tree.trees->size(); i++) {
             tree.compressTree(tree.trees->at(i));
 			tree2.compressTree(tree2.trees->at(i));
 			tree3.compressTree(tree3.trees->at(i));
@@ -526,7 +526,7 @@ int main(int argc, char **argv) {
         tree.trees = tree.expandedTrees;
 		tree2.trees = tree2.expandedTrees;
 		tree3.trees = tree3.expandedTrees;
-        
+        */
 //    }
     
 	initShader();
