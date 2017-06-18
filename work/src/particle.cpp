@@ -26,10 +26,7 @@ Particle::Particle(vec3 position, vec3 velocity, GLuint texture) {
 
 Particle::~Particle() { }
 
-void Particle::render(){
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    
+void Particle::render(){    
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
 
@@ -53,7 +50,7 @@ void Particle::render(){
 
 bool Particle::update() {
     m_position += m_velocity;
-    return (initial_position.y - m_position.y) < 30;
+    return (initial_position.y - m_position.y) < 60;
     
 //    if((initial_position.y - m_position.y) < 30 ){
 //        m_position += m_velocity;

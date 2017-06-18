@@ -51,7 +51,7 @@ float g_zfar = 1000.0;
 //
 bool g_leftMouseDown = false;
 vec2 g_mousePosition;
-float g_pitch = 0;
+float g_pitch = 1.0;
 float g_yaw = 0;
 float g_zoom = 1.0;
 
@@ -127,23 +127,23 @@ void scrollCallback(GLFWwindow *win, double xoffset, double yoffset) {
 void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 //	 cout << "Key Callback :: key=" << key << "scancode=" << scancode << "action=" << action << "mods=" << mods << endl;
     
-    if(key==GLFW_KEY_A && action == 1) {
-        humidity -= 0.1;
+    if(key==GLFW_KEY_UP && action == 2) {
+        humidity += 0.02;
+        if(humidity > 1) {humidity = 1;}
+        cout << "Humidity: " << humidity << endl;
+    }
+    if(key==GLFW_KEY_DOWN && action == 2) {
+        humidity -= 0.02;
         if(humidity < 0) {humidity = 0;}
         cout << "Humidity: " << humidity << endl;
     }
-    if(key==GLFW_KEY_D && action == 1) {
-        humidity += 0.1;
-        if(humidity > 1.0) {humidity = 1.0;}
-        cout << "Humidity: " << humidity << endl;
-    }
-    if(key==GLFW_KEY_LEFT && action == 1) {
-        temperature -= 0.1;
+    if(key==GLFW_KEY_LEFT && action == 2) {
+        temperature -= 0.02;
         if(temperature < 0) {temperature = 0;}
         cout << "Temperature: " << temperature << endl;
     }
-    if(key==GLFW_KEY_RIGHT && action == 1) {
-        temperature += 0.1;
+    if(key==GLFW_KEY_RIGHT && action == 2) {
+        temperature += 0.02;
         if(temperature > 1.0) {temperature = 1.0;}
         cout << "Temperature: " << temperature << endl;
     }
@@ -209,7 +209,7 @@ void initTexture(){
     glGenTextures(1, &g_texture);
     glActiveTexture(GL_TEXTURE0);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    Image tex("./work/res/textures/grass.png");
+    Image tex("./work/res/textures/grass.jpg");
     glBindTexture(GL_TEXTURE_2D, g_texture); // Bind it as a 2D texture
     
     // Setup sampling strategies
@@ -279,13 +279,13 @@ void renderFloor(){
     
     glNormal3f(0.0, 1.0, 0.0);
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-100.0, 0, -100.0);
-    glTexCoord2f(0.0, 100.0);
-    glVertex3f(500.0, 0, -100.0);
-    glTexCoord2f(100.0, 100.0);
-    glVertex3f(100, 0, 100);
-    glTexCoord2f(100.0, 0.0);
-    glVertex3f(-100, 0, 100);
+    glVertex3f(-20.0, 0, -20.0);
+    glTexCoord2f(0.0, 10.0);
+    glVertex3f(20.0, 0, -20.0);
+    glTexCoord2f(10.0, 10.0);
+    glVertex3f(20, 0, 20);
+    glTexCoord2f(10.0, 0.0);
+    glVertex3f(-20, 0, 20);
     glEnd();
     
     glPopMatrix();
@@ -301,7 +301,7 @@ void calculateWeather(){
     sky_color = vec3(r, g, b);
     
     // determine if raining, snowing or clear
-    if(humidity >= 0.8) {
+    if(humidity >= 0.8 && temperature < 0.9) {
         if (temperature <= 0.1) {
             particle_systems[0].disable();
             particle_systems[1].enable();
@@ -316,9 +316,9 @@ void calculateWeather(){
     }
     
     // determine amount of fog
-    glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.01 * humidity);
+    glUniform1f(glGetUniformLocation(g_shader, "fog_density"), 0.02 * humidity);
     glUniform3f(glGetUniformLocation(g_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
-    glUniform1f(glGetUniformLocation(particle_shader, "fog_density"), 0.01 * humidity);
+    glUniform1f(glGetUniformLocation(particle_shader, "fog_density"), 0.02 * humidity);
     glUniform3f(glGetUniformLocation(particle_shader, "sky_color"), sky_color.x, sky_color.y, sky_color.z);
     // heatwave memes
     glUniform1i(glGetUniformLocation(g_shader, "heatwave"), (temperature >= 0.9) ? 1 : 0);
@@ -464,8 +464,8 @@ int main(int argc, char **argv) {
 	}
 
     // initialising particle system
-    ParticleSystem rain_system = ParticleSystem("./work/res/textures/rain.png", vec3(0,30,0), 300, 300, 200, vec3(0,-1,0));
-    ParticleSystem snow_system = ParticleSystem("./work/res/textures/snow2.png", vec3(0,30,0), 300, 300, 50, vec3(0,-0.1,0));
+    ParticleSystem rain_system = ParticleSystem("./work/res/textures/rain.png", vec3(0,60,0), 100, 100, 200, vec3(0,-1,0));
+    ParticleSystem snow_system = ParticleSystem("./work/res/textures/snow2.png", vec3(0,60,0), 100, 100, 20, vec3(0,-0.05,0));
     
     particle_systems.push_back(rain_system);
     particle_systems.push_back(snow_system);

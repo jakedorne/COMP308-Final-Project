@@ -30,5 +30,4 @@ public:
     void updateParticles();
     void enable();
     void disable();
-    
 };

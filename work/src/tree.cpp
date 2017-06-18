@@ -19,12 +19,13 @@
 using namespace std;
 using namespace cgra;
 
+bool startedTexture = false;
 
 Tree::Tree()
 {
 	treeString = "X";
 	currentDepth = 0;
-	length = 0.01;
+	length = 0.000001;
 	lineWidth = 5;
 	lastTime = 0;
 	elapsedTime = 0;
@@ -133,6 +134,10 @@ void Tree::compressTree(string treeS) {
 }
 
 void Tree::drawTree() {
+    if(!startedTexture) {
+        initTextures();
+        startedTexture = true;
+    }
 	string cl; //Current letter
 	string LSystem = trees->at(currentDepth); //change to currentDepth
 	for (int i = 0; i < LSystem.length(); i++) {
@@ -205,9 +210,9 @@ void Tree::drawLine(int dCount) {
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
 	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount); 
-	cgraCylinder(0.06, 0.03, length*dCount);
+	cgraCylinder((float)(lineWidth + 1) / 50, (float) lineWidth / 50, length * dCount);
 	glPopMatrix();
-	glTranslatef(0, length*dCount, 0);
+	glTranslatef(0, length * dCount, 0);
 }
 
 void Tree::push() {
@@ -254,22 +259,22 @@ void Tree::leaf() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, leaf_texture);
     
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    glEnable(GL_BLEND);
+//    
     glBegin(GL_QUADS);
     glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-0.1, -0.1, 0.0);
+    glVertex3f(-0.5, 0.0, 0.0);
     glTexCoord2f(0.0, 1.0);
-    glVertex3f(-0.1, 0.1, 0.0);
+    glVertex3f(-0.5, 1.0, 0.0);
     glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.1, 0.1, 0.0);
+    glVertex3f(0.5, 1.0, 0.0);
     glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.1, -0.1, 0.0);
+    glVertex3f(0.5, 0.0, 0.0);
     glEnd();
     
-    glDisable(GL_BLEND);
+//    glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
     
 }
