@@ -297,21 +297,31 @@ void setupCamera(int width, int height) {
 void renderFloor(){
     glBindTexture(GL_TEXTURE_2D, g_texture);
     
-    glPushMatrix();
-    glBegin(GL_QUADS);
+
+
+    int quad_size = 20;
+    float start = - quad_size * 1.5;
     
-    glNormal3f(0.0, 1.0, 0.0);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-20.0, 0, -20.0);
-    glTexCoord2f(0.0, 10.0);
-    glVertex3f(20.0, 0, -20.0);
-    glTexCoord2f(10.0, 10.0);
-    glVertex3f(20, 0, 20);
-    glTexCoord2f(10.0, 0.0);
-    glVertex3f(-20, 0, 20);
-    glEnd();
-    
-    glPopMatrix();
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            glPushMatrix();
+            glBegin(GL_QUADS);
+            
+            glNormal3f(0.0, 1.0, 0.0);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(start + i * quad_size, 0, start + j * quad_size);
+            glTexCoord2f(0.0, 10.0);
+            glVertex3f(start + i * quad_size + quad_size, 0, start + j * quad_size);
+            glTexCoord2f(10.0, 10.0);
+            glVertex3f(start + i * quad_size + quad_size, 0, start + j * quad_size + quad_size);
+            glTexCoord2f(10.0, 0.0);
+            glVertex3f(start + i * quad_size, 0, start + j * quad_size + quad_size);
+            
+            glEnd();
+            glPopMatrix();
+        }
+    }
+
 }
 
 void calculateWeather(){
@@ -382,9 +392,9 @@ void render(int width, int height) {
     calculateWeather();
 
     glUniform1f(glGetUniformLocation(g_shader, "time"), glfwGetTime());
-
-    renderFloor();
     
+    renderFloor();
+
     if (showTrees) {
 //        for(Tree tree: trees) {
 		if (!lines) {

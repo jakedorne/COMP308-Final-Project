@@ -32,8 +32,13 @@ const float gradient = 1.0;
 // heat stuff
 const float heatwave_offset = 1;
 
-float frequency= 40.0;
-float amplitude= 0.5;
+float frequency=50.0;
+float amplitude=0.03;
+
+
+float rand(vec2 co) {
+    return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+}
 
 void main() {
     // Transform and pass on the normal/position/texture to fragment shader
@@ -50,10 +55,5 @@ void main() {
     
 	// IMPORTANT tell OpenGL where the vertex is
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    
-    if(heatwave) {
-        float distortion = sin((gl_Position.x + time) * frequency) * amplitude;
-        gl_Position.y = gl_Position.y + distortion;
-    }
 
 }
