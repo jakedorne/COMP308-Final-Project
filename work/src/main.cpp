@@ -35,6 +35,7 @@ bool showTrees = true; //Sets displaying of trees or table/bunny objects
 bool animate = true;
 bool windy = false;
 bool lines = true;
+float wind = 0.15;
 
 // Window
 //
@@ -71,9 +72,9 @@ GLuint particle_shader = 0;
 vector<Geometry> objects;
 vector<ParticleSystem> particle_systems;
 vector<Tree> trees;
-Tree tree = Tree(5,5,0);
+Tree tree = Tree(7,7,0);
 Tree tree2 = Tree(0, 0, 1);
-Tree tree3 = Tree(-5, -5, 2);
+Tree tree3 = Tree(-7, -7, 2);
 
 // weather variables
 vec3 sky_color = vec3(0.7, 0.9, 1);
@@ -150,6 +151,16 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
         if(temperature > 1.0) {temperature = 1.0;}
         cout << "Temperature: " << temperature << endl;
     }
+	if (key == GLFW_KEY_6 && action == 2) {
+		wind += 0.002;
+		if (wind > 0.3) { wind = 0.3; }
+		cout << "Wind: " << wind << endl;
+	}
+	if (key == GLFW_KEY_7 && action == 2) {
+		wind -= 0.002;
+		if (wind < 0.0) { wind = 0.0; }
+		cout << "Wind: " << wind << endl;
+	}
 	else if (key == GLFW_KEY_1 && action == 0) {
 		if (animate) {
 			animate = false;
@@ -188,7 +199,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
             }
 //        }
 	}
-	else if (key == GLFW_KEY_6 && action == 0) {
+	else if (key == GLFW_KEY_9 && action == 0) {
 		//        for(Tree tree: trees) {
 		if (lines) {
 			lines = false;
@@ -402,9 +413,9 @@ void render(int width, int height) {
 				tree3.animate();
             }
             if (windy) {
-                tree.applyWind();
-				tree2.applyWind();
-				tree3.applyWind();
+                tree.applyWind(wind);
+				tree2.applyWind(wind);
+				tree3.applyWind(wind);
             }
 //        }
     }
@@ -519,8 +530,8 @@ int main(int argc, char **argv) {
         
         for (int i = 0; i < tree.trees->size(); i++) {
             tree.compressTree(tree.trees->at(i));
-			tree2.compressTree(tree.trees->at(i));
-			tree3.compressTree(tree.trees->at(i));
+			tree2.compressTree(tree2.trees->at(i));
+			tree3.compressTree(tree3.trees->at(i));
         }
         tree.trees = tree.expandedTrees;
 		tree2.trees = tree2.expandedTrees;
