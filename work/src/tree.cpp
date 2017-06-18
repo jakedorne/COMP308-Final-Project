@@ -103,69 +103,69 @@ void Tree::compressTree(string treeS) {
 	expandedTrees->push_back(ns);
 }
 
-void Tree::drawTree() {
-	string cl; //Current letter
-	string LSystem = trees->at(currentDepth); //change to currentDepth
-	for (int i = 0; i < LSystem.length(); i++) {
-		cl = LSystem.at(i);
-		if (!cl.compare("D")) {
-			if (!isdigit(LSystem.at(i + 1))) {
-				drawLine(1);
-			}
-			else {
-				int digitCount = 0;
-				while (isdigit(LSystem.at(i + 1 + digitCount))) {
-					digitCount++;
-				}
-				string str = LSystem.substr(i + 1, digitCount);
-
-				int dCount = stoi(str);
-
-				while (LSystem.at(i + dCount) == 'D') {
-					dCount++;
-				}
-				i += digitCount;
-
-				drawLine(dCount);
-			}
-		}
-		else if (!cl.compare("X")) {
-			drawLine(1);
-		}
-		else if (!cl.compare("[")) {
-			push();
-		}
-		else if (!cl.compare("]")) {
-			pop();
-		}
-		else if (!cl.compare("V")) {
-			leaf();
-		}
-		else if (!cl.compare("R")) {
-			rotR();
-		}
-		else if (!cl.compare("L")) {
-			rotL();
-		}
-		else if (!cl.compare("F")) {
-			rotF();
-		}
-		else if (!cl.compare("B")) {
-			rotB();
-		}
-		else {
-			cout << "drawTree shouldn't reach here" << endl;
-		}
-	}
-
-}
+//void Tree::drawTree() {
+//	string cl; //Current letter
+//	string LSystem = trees->at(currentDepth); //change to currentDepth
+//	for (int i = 0; i < LSystem.length(); i++) {
+//		cl = LSystem.at(i);
+//		if (!cl.compare("D")) {
+//			if (!isdigit(LSystem.at(i + 1))) {
+//				drawLine(1);
+//			}
+//			else {
+//				int digitCount = 0;
+//				while (isdigit(LSystem.at(i + 1 + digitCount))) {
+//					digitCount++;
+//				}
+//				string str = LSystem.substr(i + 1, digitCount);
+//
+//				int dCount = stoi(str);
+//
+//				while (LSystem.at(i + dCount) == 'D') {
+//					dCount++;
+//				}
+//				i += digitCount;
+//
+//				drawLine(dCount);
+//			}
+//		}
+//		else if (!cl.compare("X")) {
+//			drawLine(1);
+//		}
+//		else if (!cl.compare("[")) {
+//			push();
+//		}
+//		else if (!cl.compare("]")) {
+//			pop();
+//		}
+//		else if (!cl.compare("V")) {
+//			leaf();
+//		}
+//		else if (!cl.compare("R")) {
+//			rotR();
+//		}
+//		else if (!cl.compare("L")) {
+//			rotL();
+//		}
+//		else if (!cl.compare("F")) {
+//			rotF();
+//		}
+//		else if (!cl.compare("B")) {
+//			rotB();
+//		}
+//		else {
+//			cout << "drawTree shouldn't reach here" << endl;
+//		}
+//	}
+//
+//}
 
 void Tree::drawTree(string ts) {
 	vector<vector<string>> *partitions = new vector<vector<string>>();
 	if (ts.find('[') != string::npos) {
 		for (int i = 0; i < ts.size();) {
 			int fCount = 0; //Front count
-			string subStr = ts.substr(i, ts.size()-i);
+			string subStr = ts.substr(i, ts.size() - i);
 			if (subStr.find('[') != string::npos) {
 				while (ts.at(i + fCount) != '[') {
 					fCount++;
@@ -174,10 +174,10 @@ void Tree::drawTree(string ts) {
 				int bCount = 1; //Bracket count
 				int eCount = 0; //Extra count
 				while (bCount > 0) {
-					if (ts.at(fCount + 1 + eCount+i) == '[') {
+					if (ts.at(fCount + 1 + eCount + i) == '[') {
 						bCount++;
 					}
-					else if (ts.at(fCount + 1 + eCount+i) == ']') {
+					else if (ts.at(fCount + 1 + eCount + i) == ']') {
 						bCount--;
 					}
 					eCount++;
@@ -189,14 +189,14 @@ void Tree::drawTree(string ts) {
 				i += fCount;
 			}
 			else {
-				vector<string> vec = { "END", subStr };
+				vector<string> vec = { "", subStr };
 				partitions->push_back(vec);
 				i += subStr.size();
 			}
 		}
 
 		/*COMPLETED MAKING PARTITION LIST
-			
+
 			TODO
 			- RECURSE OVER LIST
 			- ONCE LIST FINISHED FIGURE OUT WHAT TO DRAW FOR SELF
@@ -205,42 +205,46 @@ void Tree::drawTree(string ts) {
 		*/
 		string fullCylinder = "";
 		for (int i = 0; i < partitions->size(); i++) {
-				push();
-				string cl; //current letter
-				for (int j = 0; j < partitions->at(i)[1].size(); j++) {
-					cout << partitions->at(i)[1] << endl;
-					cl = partitions->at(i)[1].at(j);
-					if (!cl.compare("D")) {
-						translate(1);
-					}
-					else if (!cl.compare("X")) {
-						drawLine(1);
-					}
-					else if (!cl.compare("[")) {
-						push();
-					}
-					else if (!cl.compare("]")) {
-						pop();
-					}
-					else if (!cl.compare("V")) {
-						//leaf();
-					}
-					else if (!cl.compare("R")) {
-						rotR();
-					}
-					else if (!cl.compare("L")) {
-						rotL();
-					}
+			push();
+			string cl; //current letter
+			for (int j = 0; j < partitions->at(i)[0].size(); j++) {
+				cl = partitions->at(i)[0].at(j);
+				if (!cl.compare("D")) {
+					translate(1);
 				}
-				drawTree(partitions->at(i)[1]);
-				pop();	
-				fullCylinder = fullCylinder + partitions->at(i)[0];
+				else if (!cl.compare("X")) {
+					drawLine(1);
+				}
+				else if (!cl.compare("[")) {
+					push();
+				}
+				else if (!cl.compare("]")) {
+					pop();
+				}
+				else if (!cl.compare("V")) {
+					//leaf();
+				}
+				else if (!cl.compare("R")) {
+					rotR();
+				}
+				else if (!cl.compare("L")) {
+					rotL();
+				}
+			}
+			drawTree(partitions->at(i)[1]);
+			pop();
+			fullCylinder = fullCylinder + partitions->at(i)[0];
+
+			/*
+				RECURSION DONE NOW JUST DRAW COLLECTION OF ALL HEADER STRINGS
+			*/
+
+			drawTreeHeader(fullCylinder);
+			
 		}
-		cout << fullCylinder << endl;
 
 	}
 	else {
-		cout << "DRAW SECTION" << endl;
 		string cl; //Current letter
 		for (int i = 0; i < ts.size(); i++) {
 		cl = ts.at(i);
@@ -299,6 +303,27 @@ void Tree::drawTree(string ts) {
 	}*/
 }
 
+void Tree::drawTreeHeader(string str) {
+	cout << str << endl;
+	if (str.size() == 0) return;
+	int dCount = 0, splitIndex = 0;
+	for (int i = 0; i < str.size(); i++) {
+		if (str.at(i) == 'D') {
+			dCount++;
+		}
+		else {
+			splitIndex = i;
+			break;
+		}
+	}
+	if (dCount > 0) {
+		//drawLine(dCount);
+	}
+	else {
+		//SWITCH ON OTHER THINGS
+	}
+	//drawTreeHeader(str.substr(splitIndex, str.size() - splitIndex));
+}
 void Tree::translate(int dCount) {
 	glTranslatef(0, length*dCount, 0);
 }
@@ -313,7 +338,6 @@ void Tree::drawLine(int dCount) {
 }
 
 void Tree::push() {
-	//cout << "Push" << endl;
 	glPushMatrix();
 	if (lineWidth > 0) {
 		lineWidth -= 1;
@@ -321,20 +345,17 @@ void Tree::push() {
 }
 
 void Tree::pop() {
-	//cout << "Pop" << endl;
 	glPopMatrix();
 	lineWidth += 1;
 }
 
 void Tree::rotR() {
-	//cout << "rotR" << endl;
 	glRotatef(-angle, 1, 0, 0);
 	glRotatef(angle * 4, 0, 1, 0);
 	glRotatef(-angle, 0, 0, 1);
 }
 
 void Tree::rotL() {
-	//cout << "rotL" << endl;
 	glRotatef(angle, 1, 0, 0);
 	glRotatef(angle * 4, 0, 1, 0);
 	glRotatef(angle, 0, 0, 1);
@@ -351,7 +372,6 @@ void Tree::rotB() {
 }
 
 void Tree::leaf() {
-	//cout << "leaf" << endl;
 	glBegin(GL_TRIANGLES);
 	glVertex3f(0, 0, 0);
 	glVertex3f(0.2, 0, 0.3);
@@ -375,7 +395,6 @@ void Tree::animate() {
 			length += 0.0005;
 		}
 
-		//cout << elapsedTime << " : " << lastElapsedTime << endl;
 		if (elapsedTime - lastElapsedTime > 2 && currentDepth < TREEDEPTH) {
 			currentDepth++;
 			lastElapsedTime = elapsedTime;

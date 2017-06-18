@@ -49,12 +49,13 @@ public:
 	void compressTree(string treeS);
 	void drawTree(string ts);
 
-	void drawTree();
+	//void drawTree();
 	void animate();
 	void applyWind();
 
 	void setAngle(float a);
 	bool checkSame(string str);
 	void translate(int dCount);
+	void drawTreeHeader(string str);
     
 };
