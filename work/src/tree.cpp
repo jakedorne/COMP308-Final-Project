@@ -103,62 +103,62 @@ void Tree::compressTree(string treeS) {
 	expandedTrees->push_back(ns);
 }
 
-//void Tree::drawTree() {
-//	string cl; //Current letter
-//	string LSystem = trees->at(currentDepth); //change to currentDepth
-//	for (int i = 0; i < LSystem.length(); i++) {
-//		cl = LSystem.at(i);
-//		if (!cl.compare("D")) {
-//			if (!isdigit(LSystem.at(i + 1))) {
-//				drawLine(1);
-//			}
-//			else {
-//				int digitCount = 0;
-//				while (isdigit(LSystem.at(i + 1 + digitCount))) {
-//					digitCount++;
-//				}
-//				string str = LSystem.substr(i + 1, digitCount);
-//
-//				int dCount = stoi(str);
-//
-//				while (LSystem.at(i + dCount) == 'D') {
-//					dCount++;
-//				}
-//				i += digitCount;
-//
-//				drawLine(dCount);
-//			}
-//		}
-//		else if (!cl.compare("X")) {
-//			drawLine(1);
-//		}
-//		else if (!cl.compare("[")) {
-//			push();
-//		}
-//		else if (!cl.compare("]")) {
-//			pop();
-//		}
-//		else if (!cl.compare("V")) {
-//			leaf();
-//		}
-//		else if (!cl.compare("R")) {
-//			rotR();
-//		}
-//		else if (!cl.compare("L")) {
-//			rotL();
-//		}
-//		else if (!cl.compare("F")) {
-//			rotF();
-//		}
-//		else if (!cl.compare("B")) {
-//			rotB();
-//		}
-//		else {
-//			cout << "drawTree shouldn't reach here" << endl;
-//		}
-//	}
-//
-//}
+void Tree::drawTree() {
+	string cl; //Current letter
+	string LSystem = trees->at(currentDepth); //change to currentDepth
+	for (int i = 0; i < LSystem.length(); i++) {
+		cl = LSystem.at(i);
+		if (!cl.compare("D")) {
+			if (!isdigit(LSystem.at(i + 1))) {
+				drawLine(1);
+			}
+			else {
+				int digitCount = 0;
+				while (isdigit(LSystem.at(i + 1 + digitCount))) {
+					digitCount++;
+				}
+				string str = LSystem.substr(i + 1, digitCount);
+
+				int dCount = stoi(str);
+
+				while (LSystem.at(i + dCount) == 'D') {
+					dCount++;
+				}
+				i += digitCount;
+
+				drawLine(dCount);
+			}
+		}
+		else if (!cl.compare("X")) {
+			drawLine(1);
+		}
+		else if (!cl.compare("[")) {
+			push();
+		}
+		else if (!cl.compare("]")) {
+			pop();
+		}
+		else if (!cl.compare("V")) {
+			leaf();
+		}
+		else if (!cl.compare("R")) {
+			rotR();
+		}
+		else if (!cl.compare("L")) {
+			rotL();
+		}
+		else if (!cl.compare("F")) {
+			rotF();
+		}
+		else if (!cl.compare("B")) {
+			rotB();
+		}
+		else {
+			cout << "drawTree shouldn't reach here" << endl;
+		}
+	}
+
+}
 
 void Tree::drawTree(string ts) {
 	vector<vector<string>> *partitions = new vector<vector<string>>();
@@ -279,7 +279,7 @@ void Tree::drawTree(string ts) {
 			pop();
 		}
 		else if (!cl.compare("V")) {
-			//leaf();
+			leaf();
 		}
 		else if (!cl.compare("R")) {
 			rotR();

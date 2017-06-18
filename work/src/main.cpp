@@ -360,9 +360,9 @@ void render(int width, int height) {
     
     if (showTrees) {
         
-        //tree.drawTree();
+        tree.drawTree();
 		//tree.drawTree("DD[LD[LXV]D[RXV]LXV]");
-		tree.drawTree(tree.trees->at(tree.currentDepth));
+		//tree.drawTree(tree.trees->at(tree.currentDepth));
         if (animate) {
             tree.animate();
         }
@@ -475,11 +475,11 @@ int main(int argc, char **argv) {
 		tree.expandTree(0,0); //Rule set 0 is first set off rules
 	}
 
-	/*for (int i = 0; i < tree.trees->size(); i++) {
+	for (int i = 0; i < tree.trees->size(); i++) {
 		tree.compressTree(tree.trees->at(i));
 	}
 	tree.trees = tree.expandedTrees;
-	*/
+	
 
 	//tree.drawTree("DD[LD[LXV]D[RXV]LXV]DD[RD[LXV]D[RXV]LXV]LD[LXV]D[RXV]LX");
 	//tree.drawTree("DD[LD[LXV]D[RXV]DXV]DD[RD[LXV]D[RXV]DXV]DDD[LXV]D[RXV]DX");
