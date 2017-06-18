@@ -34,6 +34,7 @@ using namespace cgra;
 bool showTrees = true; //Sets displaying of trees or table/bunny objects
 bool animate = true;
 bool windy = false;
+bool lines = true;
 
 // Window
 //
@@ -70,7 +71,9 @@ GLuint particle_shader = 0;
 vector<Geometry> objects;
 vector<ParticleSystem> particle_systems;
 vector<Tree> trees;
-Tree tree = Tree();
+Tree tree = Tree(5,5,0);
+Tree tree2 = Tree(0, 0, 1);
+Tree tree3 = Tree(-5, -5, 2);
 
 // weather variables
 vec3 sky_color = vec3(0.7, 0.9, 1);
@@ -185,6 +188,16 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
             }
 //        }
 	}
+	else if (key == GLFW_KEY_6 && action == 0) {
+		//        for(Tree tree: trees) {
+		if (lines) {
+			lines = false;
+		}
+		else {
+			lines = true;
+		}
+		//        }
+	}
 	/*
 		TREE CONTROLS
 		
@@ -193,6 +206,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 		3 = Increase angle
 		4 = Decrease Angle
 		5 = Toggle grow/shrink
+		6 = 2D Trees
 	*/
 }
 
@@ -363,12 +377,25 @@ void render(int width, int height) {
     
     if (showTrees) {
 //        for(Tree tree: trees) {
-            tree.drawTree();
+		if (!lines) {
+			tree.drawTree(true);
+			tree2.drawTree(true);
+			tree3.drawTree(true);
+		}
+		else {
+			tree.drawTree(false);
+			tree2.drawTree(false);
+			tree3.drawTree(false);
+		}
             if (animate) {
                 tree.animate();
+				tree2.animate();
+				tree3.animate();
             }
             if (windy) {
                 tree.applyWind();
+				tree2.applyWind();
+				tree3.applyWind();
             }
 //        }
     }
@@ -472,21 +499,24 @@ int main(int argc, char **argv) {
     
 	double num = (double)rand() / (double)RAND_MAX;
     
-    trees.push_back(Tree());
+    //trees.push_back(Tree(0,0));
     
 //    for (Tree tree: trees) {
         for (int i = 0; i < tree.TREEDEPTH+1; i++) {
-            tree.expandTree(0,1); //Rule set 0 is first set off rules
+            tree.expandTree(0);
+			tree2.expandTree(0);
+			tree3.expandTree(0);
         }
         
         for (int i = 0; i < tree.trees->size(); i++) {
             tree.compressTree(tree.trees->at(i));
+			tree2.compressTree(tree.trees->at(i));
+			tree3.compressTree(tree.trees->at(i));
         }
         tree.trees = tree.expandedTrees;
+		tree2.trees = tree2.expandedTrees;
+		tree3.trees = tree3.expandedTrees;
         
-        cout << tree.trees->at(1) << endl;
-        
-        cout << tree.trees->size() << endl;
 //    }
     
 	initShader();

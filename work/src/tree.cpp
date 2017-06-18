@@ -21,25 +21,31 @@ using namespace cgra;
 
 bool startedTexture = false;
 
-Tree::Tree()
+Tree::Tree(float x, float z, int rule)
 {
 	treeString = "X";
 	currentDepth = 0;
 	length = 0.000001;
-	lineWidth = 5;
+	lineWidth = 6;
+	cylWidth = 0.3;
 	lastTime = 0;
 	elapsedTime = 0;
 	lastElapsedTime = 0;
 	angle = 20;
 	incr = 0.1;
 	grow = true;
-	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" };
-	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" };
-	vector<string> rule3 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" };
+	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" }; //n=7, ang=20
+	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" }; //n=7, ang=25.7
+	vector<string> rule4 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" }; //n=5, ang=22.5
+	vector<string> rule3 = { "D[LD]D[RD]D", "D[RD]D[LD]D" }; //n=5, ang=25.7
 	LSystemRules->push_back(rule1);
 	LSystemRules->push_back(rule2);
 	LSystemRules->push_back(rule3);
+	LSystemRules->push_back(rule4);
 //    initTextures();
+	posX = x;
+	posZ = z;
+	ruleNo = rule;
 }
 
 void Tree::initTextures(){
@@ -76,7 +82,7 @@ void Tree::initTextures(){
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex2.w, tex2.h, tex2.glFormat(), GL_UNSIGNED_BYTE, tex2.dataPointer());
 }
 
-void Tree::expandTree(float num, int ruleSet) {
+void Tree::expandTree(float num) {
 	string ns = "";	//New string
 
 	for (int i = 0; i < treeString.length(); i++) {
@@ -88,15 +94,15 @@ void Tree::expandTree(float num, int ruleSet) {
 		else if (!ns.compare("X")) {
 			{
 				if (num < 0.4) {
-					treeString.replace(i, 1, LSystemRules->at(ruleSet)[0]);
+					treeString.replace(i, 1, LSystemRules->at(ruleNo)[0]);
 
 				}
 				else {
-					treeString.replace(i, 1, LSystemRules->at(ruleSet)[1]);
+					treeString.replace(i, 1, LSystemRules->at(ruleNo)[1]);
 				}
 				
 				//ASSUMES BOTH RULES ARE OF THE SAME LENGTH --------------------IMPORTANT @@@@@@@@
-				i += LSystemRules->at(ruleSet)[0].size()-1;
+				i += LSystemRules->at(ruleNo)[0].size()-1;
 			}
 
 		}
@@ -133,7 +139,10 @@ void Tree::compressTree(string treeS) {
 	expandedTrees->push_back(ns);
 }
 
-void Tree::drawTree() {
+void Tree::drawTree(bool dim) {
+	glPushMatrix();
+	glTranslatef(posX, 0, posZ);
+
     if(!startedTexture) {
         initTextures();
         startedTexture = true;
@@ -143,8 +152,13 @@ void Tree::drawTree() {
 	for (int i = 0; i < LSystem.length(); i++) {
 		cl = LSystem.at(i);
 		if (!cl.compare("D")) {
-			if(!isdigit(LSystem.at(i+1))){
-				drawLine(1);
+			if (!isdigit(LSystem.at(i + 1))) {
+				if (dim) {
+				drawCyl(1);
+				}
+				else {
+					drawLine(1);
+				}
 			}
 			else {
 				int digitCount = 0;
@@ -160,11 +174,22 @@ void Tree::drawTree() {
 				}
 				i += digitCount;
 
-				drawLine(dCount);
+				if (dim) {
+					drawCyl(dCount);
+				}
+				else {
+					drawLine(dCount);
+				}
 			}
 		}
 		else if (!cl.compare("X")) {
-			drawLine(1);
+			if (dim) {
+				drawCyl(1);
+			}
+			else {
+				drawLine(1);
+			}
+
 		}
 		else if (!cl.compare("[")) {
 			push();
@@ -181,42 +206,46 @@ void Tree::drawTree() {
 		else if (!cl.compare("L")) {
 			rotL();
 		}
-		else if (!cl.compare("F")) {
-			rotF();
-		}
-		else if (!cl.compare("B")) {
-			rotB();
-		}
 		else {
 			cout << "drawTree shouldn't reach here" << endl;
 		}
 	}
 
+	glPopMatrix();
 }
 
 void Tree::drawLine(int dCount) {
-	//cout << "Draw" << endl;
-	/*
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, bark_texture);
 	glLineWidth(lineWidth);
+	glColor3f(1, 0, 0);
 	glBegin(GL_LINES);
 	glVertex3f(0, 0, 0);
-	glVertex3f(0, length*dCount, 0);
+	glVertex3f(0, dCount*length, 0);
 	glEnd();
-	glTranslatef(0, length*dCount, 0);
-	*/
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, bark_texture);
-    
-	glPushMatrix();
-	glRotatef(-90, 1, 0, 0);
-	//cgraCylinder((float)lineWidth/50, (float)lineWidth / 50, length*dCount); 
-	cgraCylinder((float)(lineWidth + 1) / 50, (float) lineWidth / 50, length * dCount);
-	glPopMatrix();
-	glTranslatef(0, length * dCount, 0);
+
+	glTranslatef(0, dCount*length, 0);
+	//glDisable(GL_TEXTURE_2D);
+}
+
+void Tree::drawCyl(int dCount) {
+	cout << lineWidth << endl;
+	if (lineWidth > 0) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, bark_texture);
+
+		glPushMatrix();
+		glRotatef(-90, 1, 0, 0);
+		cgraCylinder((float)lineWidth / 50, (float)lineWidth / 50, length * dCount);
+		glPopMatrix();
+		glTranslatef(0, length * dCount, 0);
+	}
+	else {
+		cout << "NIGGA" << endl;
+	}
 }
 
 void Tree::push() {
-	//cout << "Push" << endl;
 	glPushMatrix();
 	if (lineWidth > 0) {
 		lineWidth -= 1;
@@ -224,37 +253,23 @@ void Tree::push() {
 }
 
 void Tree::pop() {
-	//cout << "Pop" << endl;
 	glPopMatrix();
 	lineWidth += 1;
 }
 
 void Tree::rotR() {
-	//cout << "rotR" << endl;
 	glRotatef(-angle, 1, 0, 0);
 	glRotatef(angle * 4, 0, 1, 0);
 	glRotatef(-angle, 0, 0, 1);
 }
 
 void Tree::rotL() {
-	//cout << "rotL" << endl;
 	glRotatef(angle, 1, 0, 0);
 	glRotatef(angle * 4, 0, 1, 0);
 	glRotatef(angle, 0, 0, 1);
-}
-
-void Tree::rotF() {
-	glRotatef(angle, 1, 0, 0);
-	glRotatef(angle * 4, 0, 1, 0);
-	glRotatef(angle, 0, 0, 1);
-}
-
-void Tree::rotB() {
-
 }
 
 void Tree::leaf() {
-	//cout << "leaf" << endl;
     glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, leaf_texture);
@@ -275,7 +290,7 @@ void Tree::leaf() {
     glEnd();
     
 //    glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
+    //glDisable(GL_TEXTURE_2D);
     
 }
 

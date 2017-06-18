@@ -29,30 +29,33 @@ public:
 	std::clock_t lastTime;
 	double elapsedTime, lastElapsedTime;
 	float incr;
-	const int TREEDEPTH = 4;
-	float MAX_TREE_LENGTH = 0.1;
+	const int TREEDEPTH = 5;
+	float MAX_TREE_LENGTH = 0.07;
 	bool windy, grow;
+	float cylWidth;
+	float posX;
+	float posZ;
+	int ruleNo;
     
     // textures
     GLuint bark_texture;
     GLuint leaf_texture;
 
 
-	Tree();
+	Tree(float x, float z, int ruleNo);
     void initTextures();
 	void drawLine(int dCount);
+	void drawCyl(int dCount);
 	void push();
 	void pop();
 	void leaf();
 	void rotR();
 	void rotL();
-	void rotF();
-	void rotB();
 
-	void expandTree(float num, int ruleSet);
+	void expandTree(float num);
 	void compressTree(string treeS);
 
-	void drawTree();
+	void drawTree(bool dim);
 	void animate();
 	void applyWind();
 
