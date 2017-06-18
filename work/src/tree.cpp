@@ -29,18 +29,17 @@ Tree::Tree(float x, float z, int rule)
 	lastTime = 0;
 	elapsedTime = 0;
 	lastElapsedTime = 0;
-	angle = 20;
+	initAngle = 20;
+	angle = initAngle;
 	incr = 0.1;
 	grow = true;
     startedTexture = false;
 	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" }; //n=7, ang=20
 	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" }; //n=7, ang=25.7
-	vector<string> rule4 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" }; //n=5, ang=22.5
-	vector<string> rule3 = { "D[LD]D[RD]D", "D[RD]D[LD]D" }; //n=5, ang=25.7
+	vector<string> rule3 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" }; //n=5, ang=22.5
 	LSystemRules->push_back(rule1);
 	LSystemRules->push_back(rule2);
 	LSystemRules->push_back(rule3);
-	LSystemRules->push_back(rule4);
 //    initTextures();
 	posX = x;
 	posZ = z;
@@ -83,7 +82,7 @@ void Tree::initTextures(){
 
 void Tree::expandTree(float num) {
 	string ns = "";	//New string
-
+	cout << LSystemRules->at(ruleNo)[0] << endl;
 	for (int i = 0; i < treeString.length(); i++) {
 		ns = treeString.at(i);
 		if (!ns.compare("D")) {
@@ -229,7 +228,6 @@ void Tree::drawLine(int dCount) {
 
 void Tree::drawCyl(int dCount) {
 	cout << lineWidth << endl;
-	if (lineWidth > 0) {
 //		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, bark_texture);
 
@@ -238,10 +236,6 @@ void Tree::drawCyl(int dCount) {
 		cgraCylinder((float)lineWidth / 50, (float)lineWidth / 50, length * dCount);
 		glPopMatrix();
 		glTranslatef(0, length * dCount, 0);
-	}
-	else {
-		cout << "NIGGA" << endl;
-	}
 }
 
 void Tree::push() {
@@ -325,24 +319,13 @@ void Tree::animate() {
 	}
 }
 
-void Tree::applyWind() {
+void Tree::applyWind(float wind) {
 	//Make branches move in the wind/rain
-	float numR = (float)rand() / RAND_MAX;
-		if (angle > 21.5) {
-			if (numR < 0.5) {
-				incr = -0.15;
-			}
-			else {
-				incr = -0.1;
-			}
+		if (angle > initAngle+1.5) {
+				incr = -wind;
 		}
-		else if (angle < 18.5) {
-			if (numR > 0.5) {
-				incr = 0.15;
-			}
-			else {
-				incr = 0.1;
-			}
+		else if (angle < initAngle-1.5) {
+				incr = wind;
 		}
 		angle += incr;
 }

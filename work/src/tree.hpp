@@ -36,6 +36,7 @@ public:
 	float posX;
 	float posZ;
 	int ruleNo;
+	float initAngle;
     // textures
     bool startedTexture;
     GLuint bark_texture;
@@ -57,7 +58,7 @@ public:
 
 	void drawTree(bool dim);
 	void animate();
-	void applyWind();
+	void applyWind(float wind);
 
 	void setAngle(float a);
     
