@@ -51,17 +51,10 @@ void ParticleSystem::initTexture(string texture_name) {
 
 void ParticleSystem::renderParticles(){
     if(enabled) {
-        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, m_texture);
-        //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //    glEnable(GL_BLEND);
-        
         for(Particle p: m_particles) {
             p.render();
         }
-        
-        //    glDisable(GL_BLEND);
-        glDisable(GL_TEXTURE_2D);
     }
     
 }

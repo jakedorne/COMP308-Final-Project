@@ -36,8 +36,8 @@ public:
 	float posX;
 	float posZ;
 	int ruleNo;
-    
     // textures
+    bool startedTexture;
     GLuint bark_texture;
     GLuint leaf_texture;
 

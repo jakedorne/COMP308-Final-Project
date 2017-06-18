@@ -51,9 +51,4 @@ void Particle::render(){
 bool Particle::update() {
     m_position += m_velocity;
     return (initial_position.y - m_position.y) < 60;
-    
-//    if((initial_position.y - m_position.y) < 30 ){
-//        m_position += m_velocity;
-//    }
-//       return true;
 }

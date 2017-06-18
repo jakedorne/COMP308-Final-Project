@@ -284,8 +284,6 @@ void setupCamera(int width, int height) {
 }
 
 void renderFloor(){
-    glEnable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, g_texture);
     
     glPushMatrix();
@@ -303,7 +301,6 @@ void renderFloor(){
     glEnd();
     
     glPopMatrix();
-    glDisable(GL_TEXTURE_2D);
 }
 
 void calculateWeather(){
@@ -356,7 +353,9 @@ void render(int width, int height) {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
-
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    
 	setupCamera(width, height);
 
     if(g_rotating) {

@@ -19,14 +19,12 @@
 using namespace std;
 using namespace cgra;
 
-bool startedTexture = false;
-
 Tree::Tree(float x, float z, int rule)
 {
 	treeString = "X";
 	currentDepth = 0;
 	length = 0.000001;
-	lineWidth = 6;
+	lineWidth = 10;
 	cylWidth = 0.3;
 	lastTime = 0;
 	elapsedTime = 0;
@@ -34,6 +32,7 @@ Tree::Tree(float x, float z, int rule)
 	angle = 20;
 	incr = 0.1;
 	grow = true;
+    startedTexture = false;
 	vector<string> rule1 = { "D[LXV]D[RXV]LX", "D[RXV]D[LXV]RX" }; //n=7, ang=20
 	vector<string> rule2 = { "D[LXV]D[RXV]DX", "D[RXV]D[LXV]DX" }; //n=7, ang=25.7
 	vector<string> rule4 = { "DL[[X]RX]RD[RDX]LX", "DR[[X]LX]LD[LDX]RX" }; //n=5, ang=22.5
@@ -215,7 +214,7 @@ void Tree::drawTree(bool dim) {
 }
 
 void Tree::drawLine(int dCount) {
-	glActiveTexture(GL_TEXTURE0);
+//	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, bark_texture);
 	glLineWidth(lineWidth);
 	glColor3f(1, 0, 0);
@@ -231,7 +230,7 @@ void Tree::drawLine(int dCount) {
 void Tree::drawCyl(int dCount) {
 	cout << lineWidth << endl;
 	if (lineWidth > 0) {
-		glActiveTexture(GL_TEXTURE0);
+//		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, bark_texture);
 
 		glPushMatrix();
@@ -270,8 +269,8 @@ void Tree::rotL() {
 }
 
 void Tree::leaf() {
-    glEnable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
+//    glEnable(GL_TEXTURE_2D);
+//    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, leaf_texture);
     
 //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
